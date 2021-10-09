@@ -1,3 +1,5 @@
+const { hash } = require('../../utils/bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
 	const User = sequelize.define('User', {
 		email: {
@@ -21,5 +23,11 @@ module.exports = (sequelize, DataTypes) => {
 	User.associate = function(models) {
 		// associations can be defined here
 	};
+
+	User.beforeCreate(async (user) => {
+		const hashedPassword = await hash(user.password);
+		user.password = hashedPassword;
+	});
+
 	return User;
 };
