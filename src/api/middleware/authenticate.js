@@ -29,7 +29,7 @@ const validateJwtToken = async (req, res, next) => {
 
 	try {
 		const decodedToken = await decodeToken(token);
-		req.user = pick(decodedToken, ['email', 'role']);
+		req.user = pick(decodedToken, ['id', 'email', 'role']);
 		next();
 	} catch (err) {
 		logger.error(

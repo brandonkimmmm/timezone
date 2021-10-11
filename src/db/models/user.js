@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
 	});
 	User.associate = function(models) {
 		// associations can be defined here
+		User.hasMany(models.Timezone, {
+			foreignKey: 'user_id',
+			as: 'Timezones'
+		});
 	};
 
 	User.beforeCreate(async (user) => {

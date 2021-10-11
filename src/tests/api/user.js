@@ -83,4 +83,45 @@ describe('Public endpoints', () => {
 				});
 		});
 	});
+
+	describe('/GET user/timezones', () => {
+		it('it should return timezones', (done) => {
+			chai.request(app)
+				.get('/user/timezones')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+					res.body.should.be.an('array');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.get('/user/timezones')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.get('/user/timezones')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+	});
 });
