@@ -26,8 +26,9 @@ describe('Public endpoints', () => {
 
 	before(async () => {
 		await truncate();
-		await create(USERS.user.email, USERS.user.password);
-		const token = await signToken(USERS.user.email, USERS.user.role);
+		const user = await create(USERS.user.email, USERS.user.password);
+		USERS.user.id = user.id;
+		const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
 		USERS.user.token = token;
 	});
 
@@ -50,6 +51,7 @@ describe('Public endpoints', () => {
 					res.body.should.not.have.property('password');
 					res.body.email.should.equal(USERS.user.email);
 					res.body.role.should.equal(USERS.user.role);
+					res.body.id.should.equal(USERS.user.id);
 					done();
 				});
 		});

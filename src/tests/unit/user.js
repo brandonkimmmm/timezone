@@ -2,7 +2,7 @@ const chai = require('chai');
 const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
-const { get, create } = require('../../api/models/user');
+const { getByEmail, getById, create } = require('../../api/models/user');
 const { expect } = require('chai');
 
 const USERS = {
@@ -73,9 +73,9 @@ describe('User model', () => {
 		});
 	});
 
-	describe('User get', () => {
+	describe('User get By Email', () => {
 		it('it should get user data if user exists', async () => {
-			const currentUser = await get(USERS.user.email);
+			const currentUser = await getByEmail(USERS.user.email);
 
 			currentUser.should.be.an('object');
 			currentUser.should.have.property('dataValues');
@@ -90,7 +90,30 @@ describe('User model', () => {
 		});
 
 		it('it should return null if user does not exist', async () => {
-			const currentUser = await get(faker.internet.exampleEmail());
+			const currentUser = await getByEmail(faker.internet.exampleEmail());
+			should.not.exist(currentUser);
+		});
+	});
+
+	describe('User get By ID', () => {
+		it('it should get user data if user exists', async () => {
+			const currentUser = await getById(USERS.user.id);
+
+			currentUser.should.be.an('object');
+			currentUser.should.have.property('dataValues');
+			currentUser.dataValues.should.be.an('object');
+			currentUser.dataValues.should.have.property('email');
+			currentUser.dataValues.should.have.property('id');
+			currentUser.dataValues.should.have.property('password');
+			currentUser.dataValues.should.have.property('created_at');
+			currentUser.dataValues.should.have.property('updated_at');
+			currentUser.dataValues.email.should.equal(USERS.user.email);
+			currentUser.dataValues.id.should.equal(USERS.user.id);
+			currentUser.dataValues.password.should.not.equal(USERS.user.password);
+		});
+
+		it('it should return null if user does not exist', async () => {
+			const currentUser = await getById(99999999999999);
 			should.not.exist(currentUser);
 		});
 	});

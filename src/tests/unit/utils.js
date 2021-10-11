@@ -6,11 +6,13 @@ const { signToken, decodeToken } = require('../../utils/jwt');
 
 const USERS = {
 	user: {
+		id: 1,
 		email: faker.internet.exampleEmail().toLowerCase(),
 		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'user'
 	},
 	admin: {
+		id: 2,
 		email: faker.internet.exampleEmail().toLowerCase(),
 		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'admin'
@@ -20,7 +22,7 @@ const USERS = {
 describe('Utils functions', () => {
 	describe('JWT Sign', () => {
 		it('it should return signed token', async () => {
-			const token = await signToken(USERS.user.email, USERS.user.role);
+			const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
 			token.should.be.a('string');
 			USERS.user.token = token;
 		});
@@ -32,8 +34,10 @@ describe('Utils functions', () => {
 			decodedToken.should.be.an('object');
 			decodedToken.should.have.property('email');
 			decodedToken.should.have.property('role');
+			decodedToken.should.have.property('id');
 			decodedToken.email.should.equal(USERS.user.email);
 			decodedToken.role.should.equal(USERS.user.role);
+			decodedToken.id.should.equal(USERS.user.id);
 		});
 
 		it('it should throw an error if token is invalid', async () => {

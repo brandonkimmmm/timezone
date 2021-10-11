@@ -1,10 +1,31 @@
 const { User } = require('../../db/models');
 const logger = require('../../utils/logger');
-const { isString } = require('lodash');
+const { isString, isInteger } = require('lodash');
 const { isEmail } = require('validator');
 const { PASSWORD_REGEX } = require('../../config/constants');
 
-const get = async (email, opts = {}) => {
+const getById = async (id, opts = {}) => {
+	if (!isInteger(id) || id <= 0) {
+		throw new Error('Invalid id');
+	}
+
+	logger.debug(
+		'api/models/user/getById',
+		'id:',
+		id
+	);
+
+	const user = await User.findOne({
+		where: {
+			id
+		},
+		...opts
+	});
+
+	return user;
+};
+
+const getByEmail = async (email, opts = {}) => {
 	if (!isString(email) || !isEmail(email)) {
 		throw new Error('Invalid email given');
 	}
@@ -12,7 +33,7 @@ const get = async (email, opts = {}) => {
 	const formattedEmail = email.toLowerCase().trim();
 
 	logger.debug(
-		'api/models/user/get',
+		'api/models/user/getByEmail',
 		'email:',
 		email,
 		'formattedEmail:',
@@ -52,7 +73,7 @@ const create = async (
 		formattedEmail
 	);
 
-	const existingUser = await get(formattedEmail);
+	const existingUser = await getByEmail(formattedEmail);
 
 	if (existingUser) {
 		throw new Error(`User ${email} already exists`);
@@ -68,6 +89,7 @@ const create = async (
 };
 
 module.exports = {
-	get,
+	getByEmail,
+	getById,
 	create
 };

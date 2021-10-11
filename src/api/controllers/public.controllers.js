@@ -56,7 +56,7 @@ const login = async (req, res) => {
 	);
 
 	try {
-		const user = await User.get(email, { raw: true });
+		const user = await User.getByEmail(email, { raw: true });
 
 		if (!user) {
 			throw new Error('User not found');
@@ -74,7 +74,7 @@ const login = async (req, res) => {
 			'user logged in'
 		);
 
-		const token = await signToken(user.email, user.role);
+		const token = await signToken(user.id, user.email, user.role);
 
 		return res.json({
 			token

@@ -2,10 +2,11 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/constants');
 const Promise = require('bluebird');
 
-const signToken = async (email, role) => {
+const signToken = async (id, email, role) => {
 	return new Promise((resolve, reject) => {
 		jwt.sign(
 			{
+				id,
 				email,
 				role
 			},

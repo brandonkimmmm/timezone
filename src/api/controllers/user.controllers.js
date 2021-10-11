@@ -12,7 +12,7 @@ const get = async (req, res) => {
 	);
 
 	try {
-		const user = await User.get(
+		const user = await User.getByEmail(
 			email,
 			{
 				raw: true,
