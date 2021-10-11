@@ -61,6 +61,16 @@ describe('Utils functions', () => {
 			data.offset.should.equal('-4:00');
 		});
 
+		it('it should return timezone and offset for correct country', async () => {
+			const data = await getCityTimezone('los angeles', 'us');
+			data.should.be.an('object');
+			data.should.have.property('timezone');
+			data.should.have.property('offset');
+			data.timezone.should.equal('America/Los_Angeles');
+			data.offset.should.equal('-7:00');
+		});
+
+
 		it('it should throw an error if city is invalid', async () => {
 			try {
 				await getCityTimezone('nope');
