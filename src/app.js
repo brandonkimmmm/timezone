@@ -7,6 +7,7 @@ const app = express();
 const { PORT } = require('./config/constants');
 const { nanoid } = require('nanoid');
 const publicRouter = require('./api/routes/public.routes');
+const userRoutes = require('./api/routes/user.routes');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -32,6 +33,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use(publicRouter);
+app.use(userRoutes);
 
 app.use(async (req, res) => {
 	return res.status(400).json({

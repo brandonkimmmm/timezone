@@ -31,7 +31,8 @@ const get = async (email, opts = {}) => {
 
 const create = async (
 	email,
-	password
+	password,
+	opts = {}
 ) => {
 	if (!isString(email) || !isEmail(email)) {
 		throw new Error('Invalid email given');
@@ -59,7 +60,8 @@ const create = async (
 
 	const user = await User.create({
 		email: formattedEmail,
-		password
+		password,
+		...opts
 	});
 
 	return user;
