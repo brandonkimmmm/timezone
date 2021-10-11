@@ -22,6 +22,24 @@ const getCityTimezone = async (city) => {
 	};
 };
 
+const getCurrentTime = async (timezone) => {
+	return DateTime.now().setZone(timezone).toFormat('FFF');
+};
+
+const formatTimezones = async (timezones) => {
+	return timezones.map((timezone) => {
+		return {
+			name: timezone.name,
+			city: timezone.city,
+			timezone: timezone.timezone,
+			offset: timezone.offset,
+			current_time: getCurrentTime(timezone)
+		};
+	});
+};
+
 module.exports = {
-	getCityTimezone
+	getCityTimezone,
+	getCurrentTime,
+	formatTimezones
 };

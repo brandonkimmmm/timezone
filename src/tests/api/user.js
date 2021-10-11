@@ -189,6 +189,17 @@ describe('User endpoints', () => {
 					should.not.exist(err);
 					res.should.have.status(200);
 					res.body.should.be.an('array');
+					res.body.should.have.length(1);
+					res.body[0].should.be.an('object');
+					res.body[0].should.have.property('name');
+					res.body[0].should.have.property('city');
+					res.body[0].should.have.property('timezone');
+					res.body[0].should.have.property('current_time');
+					res.body[0].should.have.property('offset');
+					res.body[0].name.should.equal(TIMEZONES.name.toLowerCase());
+					res.body[0].city.should.equal(TIMEZONES.city.toLowerCase());
+					res.body[0].timezone.should.equal('America/New_York');
+					res.body[0].offset.should.equal('-4:00');
 					done();
 				});
 		});

@@ -3,7 +3,7 @@ const should = chai.should();
 const faker = require('faker');
 const { expect } = require('chai');
 const { signToken, decodeToken } = require('../../utils/jwt');
-const { getCityTimezone } = require('../../utils/cityTimezones');
+const { getCityTimezone } = require('../../utils/timezones');
 
 const USERS = {
 	user: {

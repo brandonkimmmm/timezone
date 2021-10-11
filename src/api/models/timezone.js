@@ -1,7 +1,7 @@
 const { Timezone } = require('../../db/models');
 const logger = require('../../utils/logger');
 const { isInteger, isString, isEmpty } = require('lodash');
-const { getCityTimezone } = require('../../utils/cityTimezones');
+const { getCityTimezone } = require('../../utils/timezones');
 const { getById } = require('./user');
 
 const getUserTimezones = async (user_id, opts = {}) => {

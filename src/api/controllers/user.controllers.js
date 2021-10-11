@@ -1,6 +1,7 @@
 const logger = require('../../utils/logger');
 const User = require('../models/user');
 const Timezone = require('../models/timezone');
+const { formatTimezones } = require('../../utils/timezones');
 
 const get = async (req, res) => {
 	const { email } = req.user;
@@ -51,8 +52,9 @@ const getTimezones = async (req, res) => {
 
 	try {
 		const timezones = await Timezone.getUserTimezones(id, { raw: true });
+		const formattedTimezones = await formatTimezones(timezones);
 
-		return res.json(timezones);
+		return res.json(formattedTimezones);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
