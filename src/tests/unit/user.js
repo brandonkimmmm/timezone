@@ -1,0 +1,97 @@
+const chai = require('chai');
+const should = chai.should();
+const faker = require('faker');
+const { truncate } = require('../utils/db');
+const { get, create } = require('../../api/models/user');
+const { expect } = require('chai');
+
+const USERS = {
+	user: {
+		email: faker.internet.email().toLowerCase(),
+		password: faker.internet.password(),
+		role: 'user'
+	},
+	admin: {
+		email: faker.internet.email().toLowerCase(),
+		password: faker.internet.password(),
+		role: 'admin'
+	}
+};
+
+describe('User model', () => {
+
+	before(async () => {
+		await truncate();
+	});
+
+	after(async () => {
+		await truncate();
+	});
+
+	describe('User create', () => {
+		it('it should return created user', async () => {
+			const currentUser = await create(USERS.user.email, USERS.user.password);
+
+			currentUser.should.be.an('object');
+			currentUser.should.have.property('dataValues');
+			currentUser.dataValues.should.be.an('object');
+			currentUser.dataValues.should.have.property('email');
+			currentUser.dataValues.should.have.property('id');
+			currentUser.dataValues.should.have.property('password');
+			currentUser.dataValues.should.have.property('created_at');
+			currentUser.dataValues.should.have.property('updated_at');
+			currentUser.dataValues.email.should.equal(USERS.user.email);
+			currentUser.dataValues.password.should.not.equal(USERS.user.password);
+			USERS.user.id = currentUser.dataValues.id;
+		});
+
+		it('it should throw an error if invalid email given', async () => {
+			try {
+				await create('nope', USERS.user.password);
+				chai.expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Invalid email given');
+			}
+		});
+
+		it('it should throw an error if user exists', async () => {
+			try {
+				await create(USERS.user.email, USERS.user.password);
+				chai.expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql(`User ${USERS.user.email} already exists`);
+			}
+		});
+
+		it('it should throw an error if invalid password', async () => {
+			try {
+				await create(faker.internet.email(), 'nope');
+				chai.expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Invalid password given');
+			}
+		});
+	});
+
+	describe('User get', () => {
+		it('it should get user data if user exists', async () => {
+			const currentUser = await get(USERS.user.email);
+
+			currentUser.should.be.an('object');
+			currentUser.should.have.property('dataValues');
+			currentUser.dataValues.should.be.an('object');
+			currentUser.dataValues.should.have.property('email');
+			currentUser.dataValues.should.have.property('id');
+			currentUser.dataValues.should.have.property('password');
+			currentUser.dataValues.should.have.property('created_at');
+			currentUser.dataValues.should.have.property('updated_at');
+			currentUser.dataValues.email.should.equal(USERS.user.email);
+			currentUser.dataValues.password.should.not.equal(USERS.user.password);
+		});
+
+		it('it should return null if user does not exist', async () => {
+			const currentUser = await get(faker.internet.email());
+			should.not.exist(currentUser);
+		});
+	});
+});
