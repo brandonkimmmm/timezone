@@ -1,14 +1,35 @@
 {
 	"development": {
 		"dialect": "sqlite",
-		"storage": "./database.sqlite3"
+		"storage": "./database.sqlite3",
+		"define": {
+			"timestamps": true,
+			"underscored": true,
+			"unerscoredAll": true,
+			"createdAt": "created_at",
+			"updatedAt": "updated_at"
+		}
 	},
 	"test": {
 		"dialect": "sqlite",
-		"storage": ":memory"
+		"storage": ":memory",
+		"define": {
+			"timestamps": true,
+			"underscored": true,
+			"unerscoredAll": true,
+			"createdAt": "created_at",
+			"updatedAt": "updated_at"
+		}
 	},
 	"production": {
 		"dialect": "sqlite",
-		"storage": "./database.sqlite3"
+		"storage": "./database.sqlite3",
+		"define": {
+			"timestamps": true,
+			"underscored": true,
+			"unerscoredAll": true,
+			"createdAt": "created_at",
+			"updatedAt": "updated_at"
+		}
 	}
 }

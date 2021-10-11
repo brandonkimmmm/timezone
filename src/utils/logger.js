@@ -1,7 +1,7 @@
 const winston = require('winston');
 const DailyRotateFile = require('winston-daily-rotate-file');
-const env = process.env.NODE_ENV || 'development';
-const level = env === 'production' ? 'info' : 'debug';
+const { NODE_ENV } = require('../config/constants');
+const level = NODE_ENV === 'production' ? 'info' : 'debug';
 const { SPLAT } = require('triple-beam');
 const { isPlainObject } = require('lodash');
 
@@ -34,7 +34,8 @@ const transport = new DailyRotateFile({
 	zippedArchive: true,
 	maxSize: '20m',
 	maxFiles: '14d',
-	prepend: true
+	prepend: true,
+	silent: NODE_ENV === 'test' ? true : false
 });
 
 const logger = winston.createLogger({
@@ -42,7 +43,8 @@ const logger = winston.createLogger({
 	transports: [
 		transport,
 		new winston.transports.Console({
-			level
+			level,
+			silent: NODE_ENV === 'test' ? true : false
 		})
 	]
 });

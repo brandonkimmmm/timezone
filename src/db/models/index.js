@@ -2,15 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../../config/db.json')[env];
+const { NODE_ENV } = require('../../config/constants');
+const config = require(__dirname + '/../../config/db.json')[NODE_ENV];
 const db = {};
+const logger = require('../../utils/logger');
 
 let sequelize;
 if (config.use_env_variable) {
-	sequelize = new Sequelize(process.env[config.use_env_variable], config);
+	sequelize = new Sequelize(
+		process.env[config.use_env_variable],
+		{
+			...config,
+			logging: NODE_ENV === 'test' ? false : msg => logger.debug(msg)
+		}
+	);
 } else {
-	sequelize = new Sequelize(config.database, config.username, config.password, config);
+	sequelize = new Sequelize(
+		config.database,
+		config.username,
+		config.password,
+		{
+			...config,
+			logging: NODE_ENV === 'test' ? false : msg => logger.debug(msg)
+		}
+	);
 }
 
 fs

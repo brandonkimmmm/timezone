@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { PASSWORD_REGEX } = require('../../config/constants');
 
 const signup = async (req, res, next) => {
 	const schema = Joi.object({
@@ -6,7 +7,7 @@ const signup = async (req, res, next) => {
 			.email()
 			.required(),
 		password: Joi.string()
-			.pattern(new RegExp('^[a-zA-Z0-9]{8,20}$'))
+			.pattern(PASSWORD_REGEX)
 			.required(),
 		password_confirmation: Joi.ref('password')
 	});

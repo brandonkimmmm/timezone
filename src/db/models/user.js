@@ -16,9 +16,6 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: false,
 			defaultValue: 'user'
 		}
-	}, {
-		underscored: true,
-		timestamps: true
 	});
 	User.associate = function(models) {
 		// associations can be defined here
