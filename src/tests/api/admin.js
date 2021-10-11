@@ -27,7 +27,7 @@ const TIMEZONES = {
 	name: 'My city new york'
 };
 
-describe('User endpoints', () => {
+describe('Admin endpoints', () => {
 
 	before(async () => {
 		await truncate();
@@ -35,66 +35,24 @@ describe('User endpoints', () => {
 		USERS.user.id = user.id;
 		const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
 		USERS.user.token = token;
+
+		const admin = await create(USERS.admin.email, USERS.admin.password, { role: 'admin' });
+		USERS.admin.id = admin.id;
+		const adminToken = await signToken(USERS.admin.id, USERS.admin.email, USERS.admin.role);
+		USERS.admin.token = adminToken;
 	});
 
 	after(async () => {
 		await truncate();
 	});
 
-	describe('/GET user', () => {
-		it('it should return user info', (done) => {
+	describe('/POST admin/user/timezone', () => {
+		it('it should create a timezone for a user', (done) => {
 			chai.request(app)
-				.get('/user')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(200);
-					res.body.should.be.an('object');
-					res.body.should.have.property('email');
-					res.body.should.have.property('id');
-					res.body.should.have.property('role');
-					res.body.should.not.have.property('password');
-					res.body.email.should.equal(USERS.user.email);
-					res.body.role.should.equal(USERS.user.role);
-					res.body.id.should.equal(USERS.user.id);
-					done();
-				});
-		});
-
-		it('it should return 401 if token is not given', (done) => {
-			chai.request(app)
-				.get('/user')
-				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(401);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal('Missing headers');
-					done();
-				});
-		});
-
-		it('it should return 401 if token is invalid', (done) => {
-			chai.request(app)
-				.get('/user')
-				.set('authorization', 'Bearer fasldvkas')
-				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(401);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal('Invalid token');
-					done();
-				});
-		});
-	});
-
-	describe('/POST user/timezone', () => {
-		it('it should create a timezone', (done) => {
-			chai.request(app)
-				.post('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
+				.post('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
+					user_id: USERS.user.id,
 					name: TIMEZONES.name,
 					city: TIMEZONES.city
 				})
@@ -118,7 +76,7 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is not given', (done) => {
 			chai.request(app)
-				.post('/user/timezone')
+				.post('/admin/user/timezone')
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -131,8 +89,22 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is invalid', (done) => {
 			chai.request(app)
-				.post('/user/timezone')
+				.post('/admin/user/timezone')
 				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.post('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -145,9 +117,10 @@ describe('User endpoints', () => {
 
 		it('it should return 400 if invalid city is given', (done) => {
 			chai.request(app)
-				.post('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
+				.post('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
+					user_id: USERS.user.id,
 					name: 'another',
 					city: 'nope'
 				})
@@ -163,9 +136,10 @@ describe('User endpoints', () => {
 
 		it('it should return 400 if name already exists', (done) => {
 			chai.request(app)
-				.post('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
+				.post('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
+					user_id: USERS.user.id,
 					name: TIMEZONES.name,
 					city: TIMEZONES.city
 				})
@@ -178,17 +152,35 @@ describe('User endpoints', () => {
 					done();
 				});
 		});
-	});
 
-	describe('/GET user/timezones', () => {
-		it('it should return timezones', (done) => {
+		it('it should return 400 if user not found', (done) => {
 			chai.request(app)
-				.get('/user/timezones')
-				.set('authorization', `Bearer ${USERS.user.token}`)
+				.post('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({
+					user_id: 99999,
+					name: TIMEZONES.name,
+					city: TIMEZONES.city
+				})
 				.end((err, res) => {
 					should.not.exist(err);
-					res.should.have.status(200);
-					res.body.should.be.an('array');
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
+					done();
+				});
+		});
+	});
+
+	describe('/GET admin/user/timezones', () => {
+		it('it should return user timezones', (done) => {
+			chai.request(app)
+				.get('/admin/user/timezones')
+				.query({ user_id: USERS.user.id })
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
 					res.body.should.have.length(1);
 					res.body[0].should.be.an('object');
 					res.body[0].should.have.property('name');
@@ -206,7 +198,7 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is not given', (done) => {
 			chai.request(app)
-				.get('/user/timezones')
+				.get('/admin/user/timezones')
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -219,7 +211,7 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is invalid', (done) => {
 			chai.request(app)
-				.get('/user/timezones')
+				.get('/admin/user/timezones')
 				.set('authorization', 'Bearer fasldvkas')
 				.end((err, res) => {
 					should.not.exist(err);
@@ -230,14 +222,58 @@ describe('User endpoints', () => {
 					done();
 				});
 		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.get('/admin/user/timezones')
+				.query({ user_id: USERS.user.id })
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user not found', (done) => {
+			chai.request(app)
+				.get('/admin/user/timezones')
+				.query({ user_id: 9999 })
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
+					done();
+				});
+		});
+
+		it('it should return 400 if user_id not given', (done) => {
+			chai.request(app)
+				.get('/admin/user/timezones')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('"user_id" is required');
+					done();
+				});
+		});
 	});
 
-	describe('/PUT user/timezone', () => {
-		it('it should return updated timezone', (done) => {
+	describe('/PUT admin/user/timezone', () => {
+		it('it should return updated timezone for user', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: TIMEZONES.name, updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(200);
@@ -261,9 +297,9 @@ describe('User endpoints', () => {
 
 		it('it should return 400 if all data is the same', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -276,9 +312,9 @@ describe('User endpoints', () => {
 
 		it('it should return 400 if city is invalid', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: TIMEZONES.name, updated_name: 'another name', updated_city: 'nope', country: 'US'})
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: 'another name', updated_city: 'nope', country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -291,9 +327,9 @@ describe('User endpoints', () => {
 
 		it('it should return 400 if timezone with name is not found', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: 'nope', updated_name: 'another name', updated_city: 'Los Angeles', country: 'US'})
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id, name: 'nope', updated_name: 'another name', updated_city: 'Los Angeles', country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -306,7 +342,7 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is not given', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
+				.put('/admin/user/timezone')
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -319,8 +355,53 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is invalid', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
+				.put('/admin/user/timezone')
 				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user not found', (done) => {
+			chai.request(app)
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: 99999, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
+					done();
+				});
+		});
+
+		it('it should return 400 if timezone does not belong to user', (done) => {
+			chai.request(app)
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.admin.id, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Timezone not found');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.put('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({ user_id: USERS.user.token, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -333,11 +414,26 @@ describe('User endpoints', () => {
 	});
 
 	describe('/DELETE user/timezone', () => {
-		it('it should return deleted timezone', (done) => {
+		it('it should return 400 if timezone does not belong to user', (done) => {
 			chai.request(app)
-				.delete('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: TIMEZONES.name })
+				.delete('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.admin.id, name: TIMEZONES.name })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Timezone not found');
+					done();
+				});
+		});
+
+		it('it should return user deleted timezone', (done) => {
+			chai.request(app)
+				.delete('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id, name: TIMEZONES.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(200);
@@ -356,24 +452,9 @@ describe('User endpoints', () => {
 				});
 		});
 
-		it('it should return 400 if timezone does not exist', (done) => {
-			chai.request(app)
-				.delete('/user/timezone')
-				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ name: 'nope' })
-				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal('Timezone not found');
-					done();
-				});
-		});
-
 		it('it should return 401 if token is not given', (done) => {
 			chai.request(app)
-				.delete('/user/timezone')
+				.delete('/admin/user/timezone')
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -386,8 +467,38 @@ describe('User endpoints', () => {
 
 		it('it should return 401 if token is invalid', (done) => {
 			chai.request(app)
-				.put('/user/timezone')
+				.put('/admin/user/timezone')
 				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user not found', (done) => {
+			chai.request(app)
+				.delete('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: 99999, name: TIMEZONES.name })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.delete('/admin/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({ user_id: USERS.user.token, name: TIMEZONES.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);

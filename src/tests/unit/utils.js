@@ -29,7 +29,7 @@ describe('Utils functions', () => {
 		});
 	});
 
-	describe('JWT Sign', () => {
+	describe('JWT Decode', () => {
 		it('it should return decoded token', async () => {
 			const decodedToken = await decodeToken(USERS.user.token);
 			decodedToken.should.be.an('object');

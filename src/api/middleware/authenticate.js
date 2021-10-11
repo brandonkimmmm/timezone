@@ -29,7 +29,20 @@ const validateJwtToken = async (req, res, next) => {
 
 	try {
 		const decodedToken = await decodeToken(token);
-		req.user = pick(decodedToken, ['id', 'email', 'role']);
+		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
+
+		if (req.path.includes('/admin') && decodedUser.role !== 'admin') {
+			return res.status(401).json({ message: 'Invalid token' });
+		}
+
+		logger.info(
+			req.nanoid,
+			'middleware/authenticate/validateJwtToken',
+			'authenticated user:',
+			decodedUser
+		);
+
+		req.user = decodedUser;
 		next();
 	} catch (err) {
 		logger.error(

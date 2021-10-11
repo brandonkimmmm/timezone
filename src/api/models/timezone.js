@@ -1,6 +1,6 @@
 const { Timezone } = require('../../db/models');
 const logger = require('../../utils/logger');
-const { isInteger, isString, isEmpty, pick, update } = require('lodash');
+const { isInteger, isString, isEmpty } = require('lodash');
 const { getCityTimezone } = require('../../utils/timezones');
 const { getById } = require('./user');
 
@@ -92,12 +92,6 @@ const createTimezone = async (user_id, name, city, country, opts = {}) => {
 		'city:',
 		formattedCity
 	);
-
-	const user = await getById(user_id, { raw: true });
-
-	if (!user) {
-		throw new Error('User not found');
-	}
 
 	const {
 		timezone,
@@ -208,12 +202,6 @@ const deleteUserTimezone = async (user_id, name) => {
 		'name:',
 		formattedName
 	);
-
-	const user = await getById(user_id, { raw: true });
-
-	if (!user) {
-		throw new Error('User not found');
-	}
 
 	const timezone = await getUserTimezone(user_id, formattedName);
 

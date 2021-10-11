@@ -1,64 +1,31 @@
 const logger = require('../../utils/logger');
-const User = require('../models/user');
 const Timezone = require('../models/timezone');
 const { formatTimezones } = require('../../utils/timezones');
-
-const get = async (req, res) => {
-	const { email } = req.user;
-
-	logger.info(
-		req.nanoid,
-		'api/controllers/user.controllers/get',
-		'email:',
-		email
-	);
-
-	try {
-		const user = await User.getByEmail(
-			email,
-			{
-				raw: true,
-				attributes: {
-					exclude: ['password']
-				}
-			}
-		);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
-		return res.json(user);
-	} catch (err) {
-		logger.error(
-			req.nanoid,
-			'api/controllers/user.controllers/get',
-			err.message
-		);
-
-		return res.status(400).json({ message: err.message });
-	}
-};
+const { isString } = require('lodash');
 
 const getTimezones = async (req, res) => {
-	const { id } = req.user;
+	let { user_id } = req.query;
+
+	if (isString(user_id)) {
+		user_id = parseInt(user_id);
+	}
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/user.controllers/getTimezones',
-		'id:',
-		id
+		'api/controllers/admin.controllers/getTimezones',
+		'user_id:',
+		user_id
 	);
 
 	try {
-		const timezones = await Timezone.getUserTimezones(id, { raw: true });
+		const timezones = await Timezone.getUserTimezones(user_id, { raw: true });
 		const formattedTimezones = await formatTimezones(timezones);
 
 		return res.json(formattedTimezones);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/user.controllers/getTimezones',
+			'api/controllers/admin.controllers/getTimezones',
 			err.message
 		);
 
@@ -67,9 +34,8 @@ const getTimezones = async (req, res) => {
 };
 
 const postTimezone = async (req, res) => {
-	const { id } = req.user;
-
 	const {
+		user_id,
 		name,
 		city,
 		country
@@ -77,9 +43,9 @@ const postTimezone = async (req, res) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/user.controllers/postTimezone',
-		'id:',
-		id,
+		'api/controllers/admin.controllers/postTimezone',
+		'user_id:',
+		user_id,
 		'name:',
 		name,
 		'city:',
@@ -89,13 +55,13 @@ const postTimezone = async (req, res) => {
 	);
 
 	try {
-		const timezone = await Timezone.createTimezone(id, name, city, country);
+		const timezone = await Timezone.createTimezone(user_id, name, city, country);
 
 		return res.status(201).json(timezone);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/user.controllers/postTimezone',
+			'api/controllers/admin.controllers/postTimezone',
 			err.message
 		);
 
@@ -104,9 +70,8 @@ const postTimezone = async (req, res) => {
 };
 
 const putTimezone = async (req, res) => {
-	const { id } = req.user;
-
 	const {
+		user_id,
 		updated_name,
 		updated_city,
 		country,
@@ -115,9 +80,9 @@ const putTimezone = async (req, res) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/user.controllers/putTimezone',
-		'id:',
-		id,
+		'api/controllers/admin.controllers/putTimezone',
+		'user_id:',
+		user_id,
 		'name:',
 		name,
 		'updated_name:',
@@ -129,7 +94,7 @@ const putTimezone = async (req, res) => {
 	);
 
 	try {
-		const timezone = await Timezone.updateUserTimezone(id, name, {
+		const timezone = await Timezone.updateUserTimezone(user_id, name, {
 			updated_name,
 			updated_city,
 			country
@@ -139,7 +104,7 @@ const putTimezone = async (req, res) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/user.controllers/putTimezone',
+			'api/controllers/admin.controllers/putTimezone',
 			err.message
 		);
 
@@ -148,29 +113,28 @@ const putTimezone = async (req, res) => {
 };
 
 const deleteTimezone = async (req, res) => {
-	const { id } = req.user;
-
 	const {
+		user_id,
 		name
 	} = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/user.controllers/deleteTimezone',
-		'id:',
-		id,
+		'api/controllers/admin.controllers/deleteTimezone',
+		'user_id:',
+		user_id,
 		'name:',
 		name
 	);
 
 	try {
-		const timezone = await Timezone.deleteUserTimezone(id, name);
+		const timezone = await Timezone.deleteUserTimezone(user_id, name);
 
 		return res.status(200).json(timezone);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/user.controllers/deleteTimezone',
+			'api/controllers/admin.controllers/deleteTimezone',
 			err.message
 		);
 
@@ -179,7 +143,6 @@ const deleteTimezone = async (req, res) => {
 };
 
 module.exports = {
-	get,
 	getTimezones,
 	postTimezone,
 	putTimezone,
