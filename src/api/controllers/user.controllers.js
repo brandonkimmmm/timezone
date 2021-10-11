@@ -148,9 +148,41 @@ const putTimezone = async (req, res) => {
 	}
 };
 
+const deleteTimezone = async (req, res) => {
+	const { id } = req.user;
+
+	const {
+		name
+	} = req.body;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/user.controllers/deleteTimezone',
+		'id:',
+		id,
+		'name:',
+		name
+	);
+
+	try {
+		const timezone = await Timezone.deleteUserTimezone(id, name);
+
+		return res.status(200).json(timezone);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/user.controllers/deleteTimezone',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	get,
 	getTimezones,
 	postTimezone,
-	putTimezone
+	putTimezone,
+	deleteTimezone
 };

@@ -139,9 +139,9 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 		name
 	);
 
-	const timezone = await getUserTimezone(user_id, name);
+	const existingTimezone = await getUserTimezone(user_id, name);
 
-	if (!timezone) {
+	if (!existingTimezone) {
 		throw new Error('Timezone not found');
 	}
 
@@ -154,7 +154,7 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 
 		switch (field) {
 		case 'updated_name':
-			if (value !== timezone.name) {
+			if (value !== existingTimezone.name) {
 				const existingTimezone = await getUserTimezone(user_id, value, { raw: true });
 
 				if (existingTimezone) {
@@ -165,15 +165,17 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 			}
 			break;
 		case 'updated_city':
-			if (value !== timezone.city) {
+			if (isString(value)) {
 				const {
 					timezone,
 					offset
 				} = await getCityTimezone(value, country);
 
-				updateData.city = value;
-				updateData.timezone = timezone;
-				updateData.offset = offset;
+				if (timezone !== existingTimezone.timezone) {
+					updateData.city = value;
+					updateData.timezone = timezone;
+					updateData.offset = offset;
+				}
 			}
 			break;
 		}
@@ -183,14 +185,51 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 		throw new Error('No fields to update');
 	}
 
-	const userTimezone = await timezone.update(updateData, { fields: Object.keys(updateData)});
+	const userTimezone = await existingTimezone.update(updateData, { fields: Object.keys(updateData)});
 
 	return userTimezone;
+};
+
+const deleteUserTimezone = async (user_id, name) => {
+	if (!isInteger(user_id) || user_id <= 0) {
+		throw new Error('Invalid user id given');
+	}
+
+	if (!isString(name) || isEmpty(name)) {
+		throw new Error('Invalid name given');
+	}
+
+	const formattedName = name.toLowerCase().trim();
+
+	logger.debug(
+		'api/models/timezone/deleteUserTimezone',
+		'user_id:',
+		user_id,
+		'name:',
+		formattedName
+	);
+
+	const user = await getById(user_id, { raw: true });
+
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	const timezone = await getUserTimezone(user_id, formattedName);
+
+	if (!timezone) {
+		throw new Error('Timezone not found');
+	}
+
+	await timezone.destroy();
+
+	return timezone;
 };
 
 module.exports = {
 	getUserTimezones,
 	getUserTimezone,
 	createTimezone,
-	updateUserTimezone
+	updateUserTimezone,
+	deleteUserTimezone
 };
