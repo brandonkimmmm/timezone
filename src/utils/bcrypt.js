@@ -5,6 +5,11 @@ const hash = async (string) => {
 	return bcrypt.hash(string, SALT_ROUNDS);
 };
 
+const compare = async (value, hash) => {
+	return bcrypt.compare(value, hash);
+};
+
 module.exports = {
-	hash
+	hash,
+	compare
 };

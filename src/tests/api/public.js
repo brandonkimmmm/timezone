@@ -9,13 +9,13 @@ chai.use(chaiHttp);
 
 const USERS = {
 	user: {
-		email: faker.internet.email().toLowerCase(),
-		password: faker.internet.password(),
+		email: faker.internet.exampleEmail().toLowerCase(),
+		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'user'
 	},
 	admin: {
-		email: faker.internet.email().toLowerCase(),
-		password: faker.internet.password(),
+		email: faker.internet.exampleEmail().toLowerCase(),
+		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'admin'
 	}
 };
@@ -69,7 +69,7 @@ describe('Public endpoints', () => {
 				});
 		});
 
-		it('it should throw an error if email is invalid', (done) => {
+		it('it should return 400 if email is invalid', (done) => {
 			chai.request(app)
 				.post('/signup')
 				.send({
@@ -87,7 +87,7 @@ describe('Public endpoints', () => {
 				});
 		});
 
-		it('it should throw an error if password is invalid', (done) => {
+		it('it should return 400 if password is invalid', (done) => {
 			chai.request(app)
 				.post('/signup')
 				.send({
@@ -105,7 +105,7 @@ describe('Public endpoints', () => {
 				});
 		});
 
-		it('it should throw an error if password_confirmation does not match password', (done) => {
+		it('it should return 400 if password_confirmation does not match password', (done) => {
 			chai.request(app)
 				.post('/signup')
 				.send({
@@ -123,7 +123,7 @@ describe('Public endpoints', () => {
 				});
 		});
 
-		it('it should throw an error if user already exists', (done) => {
+		it('it should return 400 error if user already exists', (done) => {
 			chai.request(app)
 				.post('/signup')
 				.send({
@@ -137,6 +137,75 @@ describe('Public endpoints', () => {
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
 					res.body.message.should.equal(`User ${USERS.user.email} already exists`);
+					done();
+				});
+		});
+	});
+
+	describe('/POST login', () => {
+		it('it should return bearer token on successful login', (done) => {
+			chai.request(app)
+				.post('/login')
+				.send({
+					email: USERS.user.email,
+					password: USERS.user.password
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+					res.body.should.be.an('object');
+					res.body.should.have.property('token');
+					done();
+				});
+		});
+
+		it('it should return 400 error if email is invalid', (done) => {
+			chai.request(app)
+				.post('/login')
+				.send({
+					email: 'nope',
+					password: USERS.user.password
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('"email" must be a valid email');
+					done();
+				});
+		});
+
+		it('it should return 400 error if password is invalid', (done) => {
+			chai.request(app)
+				.post('/login')
+				.send({
+					email: USERS.user.email,
+					password: 'hi',
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/');
+					done();
+				});
+		});
+
+		it('it should return 400 error if user is not found', (done) => {
+			chai.request(app)
+				.post('/login')
+				.send({
+					email: faker.internet.exampleEmail(),
+					password: USERS.user.password
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
 					done();
 				});
 		});

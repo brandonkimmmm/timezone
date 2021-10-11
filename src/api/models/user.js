@@ -4,7 +4,7 @@ const { isString } = require('lodash');
 const { isEmail } = require('validator');
 const { PASSWORD_REGEX } = require('../../config/constants');
 
-const get = async (email) => {
+const get = async (email, opts = {}) => {
 	if (!isString(email) || !isEmail(email)) {
 		throw new Error('Invalid email given');
 	}
@@ -22,7 +22,8 @@ const get = async (email) => {
 	const user = await User.findOne({
 		where: {
 			email: formattedEmail
-		}
+		},
+		...opts
 	});
 
 	return user;

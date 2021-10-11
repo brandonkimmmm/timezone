@@ -7,13 +7,13 @@ const { expect } = require('chai');
 
 const USERS = {
 	user: {
-		email: faker.internet.email().toLowerCase(),
-		password: faker.internet.password(),
+		email: faker.internet.exampleEmail().toLowerCase(),
+		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'user'
 	},
 	admin: {
-		email: faker.internet.email().toLowerCase(),
-		password: faker.internet.password(),
+		email: faker.internet.exampleEmail().toLowerCase(),
+		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'admin'
 	}
 };
@@ -48,7 +48,7 @@ describe('User model', () => {
 		it('it should throw an error if invalid email given', async () => {
 			try {
 				await create('nope', USERS.user.password);
-				chai.expect(true, 'promise should fail').eq(false);
+				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql('Invalid email given');
 			}
@@ -57,7 +57,7 @@ describe('User model', () => {
 		it('it should throw an error if user exists', async () => {
 			try {
 				await create(USERS.user.email, USERS.user.password);
-				chai.expect(true, 'promise should fail').eq(false);
+				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql(`User ${USERS.user.email} already exists`);
 			}
@@ -65,8 +65,8 @@ describe('User model', () => {
 
 		it('it should throw an error if invalid password', async () => {
 			try {
-				await create(faker.internet.email(), 'nope');
-				chai.expect(true, 'promise should fail').eq(false);
+				await create(faker.internet.exampleEmail(), 'nope');
+				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql('Invalid password given');
 			}
@@ -90,7 +90,7 @@ describe('User model', () => {
 		});
 
 		it('it should return null if user does not exist', async () => {
-			const currentUser = await get(faker.internet.email());
+			const currentUser = await get(faker.internet.exampleEmail());
 			should.not.exist(currentUser);
 		});
 	});
