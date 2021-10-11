@@ -541,6 +541,13 @@ ci-info@^2.0.0:
   resolved "https://registry.npmjs.org/ci-info/-/ci-info-2.0.0.tgz"
   integrity sha512-5tK7EtrZ0N+OLFMthtqOj4fI2Jeb88C4CAZPu25LDVUgXJ0A3Js4PMGqrn0JU1W0Mh1/Z8wZzYPxqUrXeBboCQ==
 
+city-timezones@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/city-timezones/-/city-timezones-1.2.0.tgz#cfd9c9d613c82dc315d2a78d2db7e6bca8109572"
+  integrity sha512-/69UkTbg9MEsYfiEIUqkKFZBRzuuw+5WLHgybeGaR/E28/w0hLy87Q4QHa0GLStp/EOxXpq5zYvDIu9xcs+bKw==
+  dependencies:
+    lodash ">=4.17.12"
+
 cli-boxes@^2.2.1:
   version "2.2.1"
   resolved "https://registry.npmjs.org/cli-boxes/-/cli-boxes-2.2.1.tgz"
@@ -2029,7 +2036,7 @@ lodash.truncate@^4.4.2:
   resolved "https://registry.npmjs.org/lodash.truncate/-/lodash.truncate-4.4.2.tgz"
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
 
-lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5:
+lodash@>=4.17.12, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5:
   version "4.17.21"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -3375,6 +3382,11 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+tzdata@^1.0.27:
+  version "1.0.27"
+  resolved "https://registry.yarnpkg.com/tzdata/-/tzdata-1.0.27.tgz#382c58c96bdac458a16265423b3d7bef469059c4"
+  integrity sha512-08ISrzAQ4o9k4ht7M3UehIYNFdKcnO0Z1Pcv+vCcF3sE/W1JlsQ99+1pKwhC7amhzddwsK7PrZhMZHR+J0gH2w==
 
 umzug@^2.3.0:
   version "2.3.0"

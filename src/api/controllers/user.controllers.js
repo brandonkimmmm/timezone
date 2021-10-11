@@ -64,7 +64,42 @@ const getTimezones = async (req, res) => {
 	}
 };
 
+const postTimezone = async (req, res) => {
+	const { id } = req.user;
+
+	const {
+		name,
+		city
+	} = req.body;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/user.controllers/postTimezone',
+		'id:',
+		id,
+		'name:',
+		name,
+		'city:',
+		city
+	);
+
+	try {
+		const timezone = await Timezone.createTimezone(id, name, city);
+
+		return res.status(201).json(timezone);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/user.controllers/postTimezone',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	get,
-	getTimezones
+	getTimezones,
+	postTimezone
 };

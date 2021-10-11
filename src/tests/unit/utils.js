@@ -3,6 +3,7 @@ const should = chai.should();
 const faker = require('faker');
 const { expect } = require('chai');
 const { signToken, decodeToken } = require('../../utils/jwt');
+const { getCityTimezone } = require('../../utils/cityTimezones');
 
 const USERS = {
 	user: {
@@ -46,6 +47,26 @@ describe('Utils functions', () => {
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql('jwt malformed');
+			}
+		});
+	});
+
+	describe('getCityTimezone', () => {
+		it('it should return timezone and offset', async () => {
+			const data = await getCityTimezone('new york');
+			data.should.be.an('object');
+			data.should.have.property('timezone');
+			data.should.have.property('offset');
+			data.timezone.should.equal('America/New_York');
+			data.offset.should.equal('-4:00');
+		});
+
+		it('it should throw an error if city is invalid', async () => {
+			try {
+				await getCityTimezone('nope');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Invalid city');
 			}
 		});
 	});

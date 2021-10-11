@@ -25,6 +25,14 @@ module.exports = {
 				type: Sequelize.STRING,
 				allowNull: false
 			},
+			timezone: {
+				type: Sequelize.STRING,
+				allowNull: false
+			},
+			offset: {
+				type: Sequelize.STRING,
+				allowNull: false
+			},
 			created_at: {
 				allowNull: false,
 				type: Sequelize.DATE

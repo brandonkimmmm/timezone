@@ -22,7 +22,12 @@ const USERS = {
 	}
 };
 
-describe('Public endpoints', () => {
+const TIMEZONES = {
+	city: 'New York',
+	name: 'My city new york'
+};
+
+describe('User endpoints', () => {
 
 	before(async () => {
 		await truncate();
@@ -79,6 +84,97 @@ describe('Public endpoints', () => {
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
 					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+	});
+
+	describe('/POST user/timezone', () => {
+		it('it should create a timezone', (done) => {
+			chai.request(app)
+				.post('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({
+					name: TIMEZONES.name,
+					city: TIMEZONES.city
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(201);
+					res.body.should.be.an('object');
+					res.body.should.have.property('user_id');
+					res.body.should.have.property('city');
+					res.body.should.have.property('name');
+					res.body.should.have.property('timezone');
+					res.body.should.have.property('offset');
+					res.body.user_id.should.equal(USERS.user.id);
+					res.body.city.should.equal(TIMEZONES.city.toLowerCase());
+					res.body.name.should.equal(TIMEZONES.name.toLowerCase());
+					res.body.timezone.should.equal('America/New_York');
+					res.body.offset.should.equal('-4:00');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.post('/user/timezone')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.post('/user/timezone')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if invalid city is given', (done) => {
+			chai.request(app)
+				.post('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({
+					name: 'another',
+					city: 'nope'
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid city');
+					done();
+				});
+		});
+
+		it('it should return 400 if name already exists', (done) => {
+			chai.request(app)
+				.post('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({
+					name: TIMEZONES.name,
+					city: TIMEZONES.city
+				})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Timezone with name already exists for user');
 					done();
 				});
 		});

@@ -7,7 +7,15 @@ module.exports = (sequelize, DataTypes) => {
 		city: {
 			type: DataTypes.STRING,
 			allowNull: false
-		}
+		},
+		timezone: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		offset: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
 	});
 	Timezone.associate = function(models) {
 		// associations can be defined here

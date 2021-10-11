@@ -38,7 +38,26 @@ const login = async (req, res, next) => {
 	}
 };
 
+const postTimezone = async (req, res, next) => {
+	const schema = Joi.object({
+		name: Joi.string()
+			.required()
+			.min(2),
+		city: Joi.string()
+			.required()
+			.min(2)
+	});
+
+	try {
+		await schema.validateAsync(req.body);
+		next();
+	} catch (err) {
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	signup,
-	login
+	login,
+	postTimezone
 };
