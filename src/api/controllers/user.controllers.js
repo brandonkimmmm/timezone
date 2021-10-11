@@ -71,7 +71,8 @@ const postTimezone = async (req, res) => {
 
 	const {
 		name,
-		city
+		city,
+		country
 	} = req.body;
 
 	logger.info(
@@ -82,11 +83,13 @@ const postTimezone = async (req, res) => {
 		'name:',
 		name,
 		'city:',
-		city
+		city,
+		'country:',
+		country
 	);
 
 	try {
-		const timezone = await Timezone.createTimezone(id, name, city);
+		const timezone = await Timezone.createTimezone(id, name, city, country);
 
 		return res.status(201).json(timezone);
 	} catch (err) {
@@ -100,8 +103,54 @@ const postTimezone = async (req, res) => {
 	}
 };
 
+const putTimezone = async (req, res) => {
+	const { id } = req.user;
+
+	const {
+		updated_name,
+		updated_city,
+		country
+	} = req.body;
+
+	const { name } = req.query;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/user.controllers/putTimezone',
+		'id:',
+		id,
+		'name:',
+		name,
+		'updated_name:',
+		updated_name,
+		'updated_city:',
+		updated_city,
+		'country:',
+		country
+	);
+
+	try {
+		const timezone = await Timezone.updateUserTimezone(id, name, {
+			updated_name,
+			updated_city,
+			country
+		});
+
+		return res.status(200).json(timezone);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/user.controllers/putTimezone',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	get,
 	getTimezones,
-	postTimezone
+	postTimezone,
+	putTimezone
 };

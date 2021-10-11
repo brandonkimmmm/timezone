@@ -1,6 +1,6 @@
 const { Timezone } = require('../../db/models');
 const logger = require('../../utils/logger');
-const { isInteger, isString, isEmpty } = require('lodash');
+const { isInteger, isString, isEmpty, pick, update } = require('lodash');
 const { getCityTimezone } = require('../../utils/timezones');
 const { getById } = require('./user');
 
@@ -67,7 +67,7 @@ const getUserTimezone = async (user_id, name, opts = {}) => {
 	return timezone;
 };
 
-const createTimezone = async (user_id, name, city, opts = {}) => {
+const createTimezone = async (user_id, name, city, country, opts = {}) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -102,7 +102,7 @@ const createTimezone = async (user_id, name, city, opts = {}) => {
 	const {
 		timezone,
 		offset
-	} = await getCityTimezone(city);
+	} = await getCityTimezone(city, country);
 
 	const existingTimezone = await getUserTimezone(user_id, formattedName, { raw: true });
 
@@ -122,8 +122,75 @@ const createTimezone = async (user_id, name, city, opts = {}) => {
 	return userTimezone;
 };
 
+const updateUserTimezone = async (user_id, name, data = {}) => {
+	if (!isInteger(user_id) || user_id <= 0) {
+		throw new Error('Invalid user id given');
+	}
+
+	if (!isString(name) || isEmpty(name)) {
+		throw new Error('Invalid name given');
+	}
+
+	logger.debug(
+		'api/models/timezone/updateUserTimezone',
+		'user_id:',
+		user_id,
+		'name:',
+		name
+	);
+
+	const timezone = await getUserTimezone(user_id, name);
+
+	if (!timezone) {
+		throw new Error('Timezone not found');
+	}
+
+	const country = data.country;
+
+	const updateData = {};
+
+	for (const field in data) {
+		const value = data[field].toLowerCase().trim();
+
+		switch (field) {
+		case 'updated_name':
+			if (value !== timezone.name) {
+				const existingTimezone = await getUserTimezone(user_id, value, { raw: true });
+
+				if (existingTimezone) {
+					throw new Error('Timezone with name already exists');
+				}
+
+				updateData.name = value;
+			}
+			break;
+		case 'updated_city':
+			if (value !== timezone.city) {
+				const {
+					timezone,
+					offset
+				} = await getCityTimezone(value, country);
+
+				updateData.city = value;
+				updateData.timezone = timezone;
+				updateData.offset = offset;
+			}
+			break;
+		}
+	}
+
+	if (isEmpty(updateData)) {
+		throw new Error('No fields to update');
+	}
+
+	const userTimezone = await timezone.update(updateData, { fields: Object.keys(updateData)});
+
+	return userTimezone;
+};
+
 module.exports = {
 	getUserTimezones,
 	getUserTimezone,
-	createTimezone
+	createTimezone,
+	updateUserTimezone
 };

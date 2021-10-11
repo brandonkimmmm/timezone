@@ -231,4 +231,105 @@ describe('User endpoints', () => {
 				});
 		});
 	});
+
+	describe('/PUT user/timezone', () => {
+		it('it should return timezones', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.query({ name: TIMEZONES.name })
+				.send({ updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+					res.body.should.be.an('object');
+					res.body.should.have.property('user_id');
+					res.body.should.have.property('city');
+					res.body.should.have.property('name');
+					res.body.should.have.property('timezone');
+					res.body.should.have.property('offset');
+					res.body.user_id.should.equal(USERS.user.id);
+					res.body.city.should.equal('los angeles');
+					res.body.name.should.equal('updated name');
+					res.body.timezone.should.equal('America/Los_Angeles');
+					res.body.offset.should.equal('-7:00');
+					done();
+				});
+		});
+
+		it('it should return 400 if all data is the same', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.query({ name: 'updated name' })
+				.send({ updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('No fields to update');
+					done();
+				});
+		});
+
+		it('it should return 400 if city is invalid', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.query({ name: 'updated name' })
+				.send({ updated_name: 'another name', updated_city: 'nope', country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid city');
+					done();
+				});
+		});
+
+		it('it should return 400 if timezone with name is not found', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.query({ name: 'nope' })
+				.send({ updated_name: 'another name', updated_city: 'Los Angeles', country: 'US'})
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Timezone not found');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.put('/user/timezone')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+	});
 });

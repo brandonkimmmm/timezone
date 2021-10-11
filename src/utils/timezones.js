@@ -2,7 +2,7 @@ const cityTimezones = require('city-timezones');
 const { isString, isEmpty } = require('lodash');
 const { DateTime } = require('luxon');
 
-const getCityTimezone = async (city) => {
+const getCityTimezone = async (city, country) => {
 	if (!isString(city) || isEmpty(city)) {
 		throw new Error('Invalid city');
 	}
@@ -13,7 +13,15 @@ const getCityTimezone = async (city) => {
 		throw new Error('Invalid city');
 	}
 
-	const timezone = cityLookup[0].timezone;
+	let foundCity;
+
+	if (isString(country) && country.length === 2) {
+		foundCity = cityLookup.find((city) => city.iso2 === country.toUpperCase());
+	} else {
+		foundCity = cityLookup[0];
+	}
+
+	const timezone = foundCity.timezone;
 	const offset = `${DateTime.now().setZone(timezone).offset / 60}:00`;
 
 	return {

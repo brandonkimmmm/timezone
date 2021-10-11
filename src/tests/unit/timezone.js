@@ -2,7 +2,7 @@ const chai = require('chai');
 const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
-const { createTimezone, getUserTimezone, getUserTimezones } = require('../../api/models/timezone');
+const { createTimezone, getUserTimezone, getUserTimezones, updateUserTimezone } = require('../../api/models/timezone');
 const { create } = require('../../api/models/user');
 const { expect } = require('chai');
 
@@ -141,6 +141,53 @@ describe('Timezone model', () => {
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql('User not found');
+			}
+		});
+	});
+
+	describe('Timezone update', () => {
+		it('it should update an existing timezone for user', async () => {
+			const timezone = await updateUserTimezone(USERS.user.id, TIMEZONES.name, { updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US' });
+
+			timezone.should.be.an('object');
+			timezone.should.have.property('dataValues');
+			timezone.dataValues.should.be.an('object');
+			timezone.dataValues.should.have.property('user_id');
+			timezone.dataValues.should.have.property('timezone');
+			timezone.dataValues.should.have.property('city');
+			timezone.dataValues.should.have.property('name');
+			timezone.dataValues.should.have.property('offset');
+			timezone.dataValues.user_id.should.equal(USERS.user.id);
+			timezone.dataValues.timezone.should.equal('America/Los_Angeles');
+			timezone.dataValues.city.should.equal('los angeles');
+			timezone.dataValues.name.should.equal('updated name');
+			timezone.dataValues.offset.should.equal('-7:00');
+		});
+
+		it('it should throw an error if user does not exist', async () => {
+			try {
+				await updateUserTimezone(9999999, 'updated name', { updated_name: 'updated name', updated_city: 'Los Angeles'});
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('User not found');
+			}
+		});
+
+		it('it should throw an error if update data not given', async () => {
+			try {
+				await updateUserTimezone(USERS.user.id, 'updated name', { });
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('No fields to update');
+			}
+		});
+
+		it('it should throw an error if name and city are the same', async () => {
+			try {
+				await updateUserTimezone(USERS.user.id, 'updated name', { updated_name: 'updated name', updated_city: 'Los Angeles' });
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('No fields to update');
 			}
 		});
 	});

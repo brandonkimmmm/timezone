@@ -45,7 +45,9 @@ const postTimezone = async (req, res, next) => {
 			.min(2),
 		city: Joi.string()
 			.required()
-			.min(2)
+			.min(2),
+		country: Joi.string()
+			.length(2)
 	});
 
 	try {
@@ -56,8 +58,36 @@ const postTimezone = async (req, res, next) => {
 	}
 };
 
+const putTimezone = async (req, res, next) => {
+	const querySchema = Joi.object({
+		name: Joi.string()
+			.required()
+			.min(2)
+	});
+
+	const bodySchema = Joi.object({
+		updated_name: Joi.string()
+			.required()
+			.min(2),
+		updated_city: Joi.string()
+			.required()
+			.min(2),
+		country: Joi.string()
+			.length(2)
+	});
+
+	try {
+		await querySchema.validateAsync(req.query);
+		await bodySchema.validateAsync(req.body);
+		next();
+	} catch (err) {
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	signup,
 	login,
-	postTimezone
+	postTimezone,
+	putTimezone
 };
