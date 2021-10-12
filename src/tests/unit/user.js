@@ -3,6 +3,8 @@ const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
 const { getByEmail, getById, create, updateRole, deleteUser } = require('../../api/models/user');
+const { createTimezone } = require('../../api/models/timezone');
+const { Timezone } = require('../../db/models');
 const { expect } = require('chai');
 
 const USERS = {
@@ -16,6 +18,11 @@ const USERS = {
 		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
 		role: 'admin'
 	}
+};
+
+const TIMEZONES = {
+	city: 'New York',
+	name: 'My city new york'
 };
 
 describe('User model', () => {
@@ -191,7 +198,13 @@ describe('User model', () => {
 	});
 
 	describe('User delete', () => {
-		it('it should delete user', async () => {
+		it('it should delete user and timezones for user', async () => {
+			await createTimezone(USERS.user.id, TIMEZONES.name, TIMEZONES.city);
+
+			const timezones = await Timezone.findAll({ where: { user_id: USERS.user.id }, raw: true });
+
+			timezones.should.have.lengthOf(1);
+
 			const user = await deleteUser(USERS.user.id);
 
 			user.should.be.an('object');
@@ -209,6 +222,10 @@ describe('User model', () => {
 
 			const deletedUser = await getById(USERS.user.id);
 			should.not.exist(deletedUser);
+
+			const userTimezones = await Timezone.findAll({ where: { user_id: USERS.user.id }, raw: true });
+
+			userTimezones.should.have.lengthOf(0);
 		});
 
 		it('it should throw an error if user does not exist', async () => {

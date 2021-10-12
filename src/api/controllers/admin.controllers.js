@@ -214,11 +214,39 @@ const getUser = async (req, res) => {
 	}
 };
 
+const deleteUser = async (req, res) => {
+	const {
+		user_id
+	} = req.body;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/admin.controllers/deleteUser',
+		'user_id:',
+		user_id
+	);
+
+	try {
+		const user = await User.deleteUser(user_id);
+
+		return res.status(200).json(omit(user.dataValues, ['password']));
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/admin.controllers/deleteUser',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	getTimezones,
 	postTimezone,
 	putTimezone,
 	deleteTimezone,
 	putUserRole,
-	getUser
+	getUser,
+	deleteUser
 };

@@ -730,4 +730,100 @@ describe('Admin endpoints', () => {
 				});
 		});
 	});
+
+	describe('/DELETE admin/user', () => {
+		it('it should return user deleted timezone', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: USERS.user.id })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+					res.body.should.be.an('object');
+					res.body.should.have.property('id');
+					res.body.should.have.property('email');
+					res.body.should.have.property('role');
+					res.body.should.have.property('created_at');
+					res.body.should.have.property('updated_at');
+					res.body.should.not.have.property('password');
+					res.body.id.should.equal(USERS.user.id);
+					res.body.email.should.equal(USERS.user.email);
+					res.body.role.should.equal('admin');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user not found', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: 99999 })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('User not found');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({ user_id: USERS.user.id })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user id 1 is given', (done) => {
+			chai.request(app)
+				.delete('/admin/user')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ user_id: 1 })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Cannot delete master admin');
+					done();
+				});
+		});
+	});
 });
