@@ -1,8 +1,8 @@
 const { User } = require('../../db/models');
 const logger = require('../../utils/logger');
-const { isString, isInteger } = require('lodash');
+const { isString, isInteger, isEmpty } = require('lodash');
 const { isEmail } = require('validator');
-const { PASSWORD_REGEX } = require('../../config/constants');
+const { PASSWORD_REGEX, VALID_ROLES } = require('../../config/constants');
 
 const getById = async (id, opts = {}) => {
 	if (!isInteger(id) || id <= 0) {
@@ -88,8 +88,56 @@ const create = async (
 	return user;
 };
 
+const updateRole = async (
+	id,
+	role
+) => {
+	if (!isInteger(id) || id <= 0) {
+		throw new Error('Invalid id given');
+	}
+
+	if (id === 1) {
+		throw new Error('Cannot update master admin role');
+	}
+
+	if (!isString(role) || isEmpty(role)) {
+		throw new Error('Invalid role given');
+	}
+
+	const formattedRole = role.toLowerCase().trim();
+
+	if (!VALID_ROLES.includes(formattedRole)) {
+		throw new Error('Invalid role given');
+	}
+
+	logger.debug(
+		'api/models/user/updateUserRole',
+		'id:',
+		id,
+		'role:',
+		formattedRole
+	);
+
+	const user = await getById(id);
+
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	if (user.role === formattedRole) {
+		throw new Error(`User already has role ${formattedRole}`);
+	}
+
+	await user.update({
+		role: formattedRole
+	}, { fields: ['role'] });
+
+	return user;
+};
+
 module.exports = {
 	getByEmail,
 	getById,
-	create
+	create,
+	updateRole
 };

@@ -2,7 +2,7 @@ const chai = require('chai');
 const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
-const { getByEmail, getById, create } = require('../../api/models/user');
+const { getByEmail, getById, create, updateRole } = require('../../api/models/user');
 const { expect } = require('chai');
 
 const USERS = {
@@ -115,6 +115,78 @@ describe('User model', () => {
 		it('it should return null if user does not exist', async () => {
 			const currentUser = await getById(99999999999999);
 			should.not.exist(currentUser);
+		});
+	});
+
+	describe('User update role', () => {
+		it('it should update user role to admin if user exists', async () => {
+			const user = await updateRole(USERS.user.id, 'admin');
+
+			user.should.be.an('object');
+			user.should.have.property('dataValues');
+			user.dataValues.should.be.an('object');
+			user.dataValues.should.have.property('email');
+			user.dataValues.should.have.property('id');
+			user.dataValues.should.have.property('password');
+			user.dataValues.should.have.property('role');
+			user.dataValues.should.have.property('created_at');
+			user.dataValues.should.have.property('updated_at');
+			user.dataValues.email.should.equal(USERS.user.email);
+			user.dataValues.id.should.equal(USERS.user.id);
+			user.dataValues.role.should.equal('admin');
+		});
+
+		it('it should update user role to user if user exists', async () => {
+			const user = await updateRole(USERS.user.id, 'user');
+
+			user.should.be.an('object');
+			user.should.have.property('dataValues');
+			user.dataValues.should.be.an('object');
+			user.dataValues.should.have.property('email');
+			user.dataValues.should.have.property('id');
+			user.dataValues.should.have.property('password');
+			user.dataValues.should.have.property('role');
+			user.dataValues.should.have.property('created_at');
+			user.dataValues.should.have.property('updated_at');
+			user.dataValues.email.should.equal(USERS.user.email);
+			user.dataValues.id.should.equal(USERS.user.id);
+			user.dataValues.role.should.equal('user');
+		});
+
+		it('it should throw an error if invalid role is given', async () => {
+			try {
+				await updateRole(USERS.user.id, 'nope');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Invalid role given');
+			}
+		});
+
+		it('it should throw an error if role is the same', async () => {
+			try {
+				await updateRole(USERS.user.id, 'user');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('User already has role user');
+			}
+		});
+
+		it('it should throw an error if user not found', async () => {
+			try {
+				await updateRole(999999, 'user');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('User not found');
+			}
+		});
+
+		it('it should throw an error if user id 1 is given', async () => {
+			try {
+				await updateRole(1, 'user');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Cannot update master admin role');
+			}
 		});
 	});
 });
