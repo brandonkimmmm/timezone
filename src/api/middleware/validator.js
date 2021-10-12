@@ -206,6 +206,23 @@ const adminPutUserRole = async (req, res, next) => {
 	}
 };
 
+const adminGetUser = async (req, res, next) => {
+	const schema = Joi.object({
+		user_id: Joi.number()
+			.integer()
+			.min(0)
+			.not(0)
+			.required(),
+	});
+
+	try {
+		await schema.validateAsync(req.query);
+		next();
+	} catch (err) {
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	signup,
 	login,
@@ -216,5 +233,6 @@ module.exports = {
 	adminPostTimezone,
 	adminPutTimezone,
 	adminDeleteTimezone,
-	adminPutUserRole
+	adminPutUserRole,
+	adminGetUser
 };

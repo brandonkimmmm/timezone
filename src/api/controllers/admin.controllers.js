@@ -173,10 +173,52 @@ const putUserRole = async (req, res) => {
 	}
 };
 
+const getUser = async (req, res) => {
+	let { user_id } = req.query;
+
+	if (isString(user_id)) {
+		user_id = parseInt(user_id);
+	}
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/admin.controllers/getUser',
+		'user_id:',
+		user_id
+	);
+
+	try {
+		const user = await User.getById(
+			user_id,
+			{
+				raw: true,
+				attributes: {
+					exclude: ['password']
+				}
+			}
+		);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		return res.json(user);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/admin.controllers/getUser',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	getTimezones,
 	postTimezone,
 	putTimezone,
 	deleteTimezone,
-	putUserRole
+	putUserRole,
+	getUser
 };
