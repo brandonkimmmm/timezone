@@ -2,7 +2,7 @@ const { User } = require('../../db/models');
 const logger = require('../../utils/logger');
 const { isString, isInteger, isEmpty } = require('lodash');
 const { isEmail } = require('validator');
-const { PASSWORD_REGEX, VALID_ROLES } = require('../../config/constants');
+const { PASSWORD_REGEX, VALID_ROLES, MASTER_ADMIN } = require('../../config/constants');
 
 const getById = async (id, opts = {}) => {
 	if (!isInteger(id) || id <= 0) {
@@ -96,7 +96,7 @@ const updateRole = async (
 		throw new Error('Invalid id given');
 	}
 
-	if (id === 1) {
+	if (id === MASTER_ADMIN) {
 		throw new Error('Cannot update master admin role');
 	}
 
@@ -140,7 +140,7 @@ const deleteUser = async (id) => {
 		throw new Error('Invalid id given');
 	}
 
-	if (id === 1) {
+	if (id === MASTER_ADMIN) {
 		throw new Error('Cannot delete master admin');
 	}
 
