@@ -135,9 +135,36 @@ const updateRole = async (
 	return user;
 };
 
+const deleteUser = async (id) => {
+	if (!isInteger(id) || id <= 0) {
+		throw new Error('Invalid id given');
+	}
+
+	if (id === 1) {
+		throw new Error('Cannot delete master admin');
+	}
+
+	logger.debug(
+		'api/models/user/deleteUser',
+		'id:',
+		id
+	);
+
+	const user = await getById(id);
+
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	await user.destroy();
+
+	return user;
+};
+
 module.exports = {
 	getByEmail,
 	getById,
 	create,
-	updateRole
+	updateRole,
+	deleteUser
 };

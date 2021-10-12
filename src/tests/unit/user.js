@@ -2,7 +2,7 @@ const chai = require('chai');
 const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
-const { getByEmail, getById, create, updateRole } = require('../../api/models/user');
+const { getByEmail, getById, create, updateRole, deleteUser } = require('../../api/models/user');
 const { expect } = require('chai');
 
 const USERS = {
@@ -186,6 +186,46 @@ describe('User model', () => {
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err.message).to.eql('Cannot update master admin role');
+			}
+		});
+	});
+
+	describe('User delete', () => {
+		it('it should delete user', async () => {
+			const user = await deleteUser(USERS.user.id);
+
+			user.should.be.an('object');
+			user.should.have.property('dataValues');
+			user.dataValues.should.be.an('object');
+			user.dataValues.should.have.property('email');
+			user.dataValues.should.have.property('id');
+			user.dataValues.should.have.property('password');
+			user.dataValues.should.have.property('role');
+			user.dataValues.should.have.property('created_at');
+			user.dataValues.should.have.property('updated_at');
+			user.dataValues.email.should.equal(USERS.user.email);
+			user.dataValues.id.should.equal(USERS.user.id);
+			user.dataValues.role.should.equal('user');
+
+			const deletedUser = await getById(USERS.user.id);
+			should.not.exist(deletedUser);
+		});
+
+		it('it should throw an error if user does not exist', async () => {
+			try {
+				await deleteUser(USERS.user.id);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('User not found');
+			}
+		});
+
+		it('it should throw an error if user id is 1', async () => {
+			try {
+				await deleteUser(1);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err.message).to.eql('Cannot delete master admin');
 			}
 		});
 	});
