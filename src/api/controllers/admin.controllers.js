@@ -1,7 +1,8 @@
 const logger = require('../../utils/logger');
 const Timezone = require('../models/timezone');
+const User = require('../models/user');
 const { formatTimezones } = require('../../utils/timezones');
-const { isString } = require('lodash');
+const { isString, omit } = require('lodash');
 
 const getTimezones = async (req, res) => {
 	let { user_id } = req.query;
@@ -142,9 +143,40 @@ const deleteTimezone = async (req, res) => {
 	}
 };
 
+const putUserRole = async (req, res) => {
+	const {
+		user_id,
+		role
+	} = req.body;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/admin.controllers/putUserRole',
+		'user_id:',
+		user_id,
+		'role:',
+		role
+	);
+
+	try {
+		const timezone = await User.updateRole(user_id, role);
+
+		return res.status(200).json(omit(timezone.dataValues, ['password']));
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/admin.controllers/putUserRole',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	getTimezones,
 	postTimezone,
 	putTimezone,
-	deleteTimezone
+	deleteTimezone,
+	putUserRole
 };

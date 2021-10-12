@@ -186,6 +186,26 @@ const adminDeleteTimezone = async (req, res, next) => {
 	}
 };
 
+const adminPutUserRole = async (req, res, next) => {
+	const schema = Joi.object({
+		user_id: Joi.number()
+			.integer()
+			.min(0)
+			.not(0)
+			.required(),
+		role: Joi.string()
+			.required()
+			.valid('admin', 'user')
+	});
+
+	try {
+		await schema.validateAsync(req.body);
+		next();
+	} catch (err) {
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	signup,
 	login,
@@ -195,5 +215,6 @@ module.exports = {
 	adminGetTimezones,
 	adminPostTimezone,
 	adminPutTimezone,
-	adminDeleteTimezone
+	adminDeleteTimezone,
+	adminPutUserRole
 };
