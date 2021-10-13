@@ -31,15 +31,15 @@ describe('Admin endpoints', () => {
 
 	before(async () => {
 		await truncate();
-		const user = await create(USERS.user.email, USERS.user.password);
-		USERS.user.id = user.id;
-		const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
-		USERS.user.token = token;
-
 		const admin = await create(USERS.admin.email, USERS.admin.password, { role: 'admin' });
 		USERS.admin.id = admin.id;
 		const adminToken = await signToken(USERS.admin.id, USERS.admin.email, USERS.admin.role);
 		USERS.admin.token = adminToken;
+
+		const user = await create(USERS.user.email, USERS.user.password);
+		USERS.user.id = user.id;
+		const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
+		USERS.user.token = token;
 	});
 
 	after(async () => {
@@ -263,6 +263,110 @@ describe('Admin endpoints', () => {
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
 					res.body.message.should.equal('"user_id" is required');
+					done();
+				});
+		});
+	});
+
+	describe('/GET admin/users', () => {
+		it('it should return users', (done) => {
+			chai.request(app)
+				.get('/admin/users')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+
+					res.body.should.have.length(2);
+
+					res.body[0].should.be.an('object');
+					res.body[0].should.have.property('id');
+					res.body[0].should.have.property('email');
+					res.body[0].should.have.property('role');
+					res.body[0].should.have.property('created_at');
+					res.body[0].should.have.property('updated_at');
+					res.body[0].should.not.have.property('password');
+					res.body[0].id.should.equal(USERS.admin.id);
+					res.body[0].email.should.equal(USERS.admin.email);
+					res.body[0].role.should.equal('admin');
+
+
+					res.body[1].should.be.an('object');
+					res.body[1].should.have.property('id');
+					res.body[1].should.have.property('email');
+					res.body[1].should.have.property('role');
+					res.body[1].should.have.property('created_at');
+					res.body[1].should.have.property('updated_at');
+					res.body[1].should.not.have.property('password');
+					res.body[1].id.should.equal(USERS.user.id);
+					res.body[1].email.should.equal(USERS.user.email);
+					res.body[1].role.should.equal('user');
+					done();
+				});
+		});
+
+		it('it should only return admin users', (done) => {
+			chai.request(app)
+				.get('/admin/users')
+				.query({ role: 'admin' })
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(200);
+
+					res.body.should.have.length(1);
+
+					res.body[0].should.be.an('object');
+					res.body[0].should.have.property('id');
+					res.body[0].should.have.property('email');
+					res.body[0].should.have.property('role');
+					res.body[0].should.have.property('created_at');
+					res.body[0].should.have.property('updated_at');
+					res.body[0].should.not.have.property('password');
+					res.body[0].id.should.equal(USERS.admin.id);
+					res.body[0].email.should.equal(USERS.admin.email);
+					res.body[0].role.should.equal('admin');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.get('/admin/users')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.get('/admin/users')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.get('/admin/users')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
 					done();
 				});
 		});

@@ -96,6 +96,31 @@ describe('User model', () => {
 			users[0].dataValues.email.should.equal(USERS.user.email);
 			users[0].dataValues.password.should.not.equal(USERS.user.password);
 		});
+
+		it('it should get all user data with role admin', async () => {
+			const users = await getAll({ where: { role: 'admin' }, order: [['id', 'asc']]});
+
+			users.should.be.an('array');
+			users.should.have.length(0);
+		});
+
+		it('it should get all user data with role user', async () => {
+			const users = await getAll({ where: { role: 'user' }, order: [['id', 'asc']]});
+
+			users.should.be.an('array');
+			users.should.have.length(1);
+			users[0].should.have.property('dataValues');
+			users[0].dataValues.should.be.an('object');
+			users[0].dataValues.should.have.property('email');
+			users[0].dataValues.should.have.property('id');
+			users[0].dataValues.should.have.property('password');
+			users[0].dataValues.should.have.property('created_at');
+			users[0].dataValues.should.have.property('updated_at');
+			users[0].dataValues.should.have.property('role');
+			users[0].dataValues.email.should.equal(USERS.user.email);
+			users[0].dataValues.role.should.equal('user');
+			users[0].dataValues.password.should.not.equal(USERS.user.password);
+		});
 	});
 
 	describe('User get By Email', () => {

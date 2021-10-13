@@ -241,6 +241,43 @@ const deleteUser = async (req, res) => {
 	}
 };
 
+const getUsers = async (req, res) => {
+	const { role } = req.query;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/admin.controllers/getUsers',
+		'role:',
+		role
+	);
+
+	const options = {
+		raw: true,
+		attributes: {
+			exclude: ['password']
+		},
+		order: [['id', 'asc']]
+	};
+
+	if (role) {
+		options.where = { role };
+	}
+
+	try {
+		const users = await User.getAll(options);
+
+		return res.json(users);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/admin.controllers/getUsers',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	getTimezones,
 	postTimezone,
@@ -248,5 +285,6 @@ module.exports = {
 	deleteTimezone,
 	putUserRole,
 	getUser,
+	getUsers,
 	deleteUser
 };

@@ -11,5 +11,6 @@ router.delete('/admin/user/timezone', [ authenticate.validateJwtToken, validator
 router.put('/admin/user/role', [ authenticate.validateJwtToken, validator.adminPutUserRole ], adminControllers.putUserRole);
 router.get('/admin/user', [ authenticate.validateJwtToken, validator.adminGetUser ], adminControllers.getUser);
 router.delete('/admin/user', [ authenticate.validateJwtToken, validator.adminDeleteUser ], adminControllers.deleteUser);
+router.get('/admin/users', [ authenticate.validateJwtToken, validator.adminGetUsers ], adminControllers.getUsers);
 
 module.exports = router;

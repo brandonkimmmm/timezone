@@ -223,6 +223,20 @@ const adminGetUser = async (req, res, next) => {
 	}
 };
 
+const adminGetUsers = async (req, res, next) => {
+	const schema = Joi.object({
+		role: Joi.string()
+			.valid('admin', 'user')
+	});
+
+	try {
+		await schema.validateAsync(req.query);
+		next();
+	} catch (err) {
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 const adminDeleteUser = async (req, res, next) => {
 	const schema = Joi.object({
 		user_id: Joi.number()
@@ -253,5 +267,6 @@ module.exports = {
 	adminDeleteTimezone,
 	adminPutUserRole,
 	adminGetUser,
-	adminDeleteUser
+	adminDeleteUser,
+	adminGetUsers
 };
