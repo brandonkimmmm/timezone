@@ -278,6 +278,39 @@ const getUsers = async (req, res) => {
 	}
 };
 
+const createUser = async (req, res) => {
+	const { email, password } = req.body;
+
+	logger.info(
+		req.nanoid,
+		'api/controllers/admin.controllers/createUser',
+		'email:',
+		email
+	);
+
+	try {
+		const user = await User.create(email, password);
+
+		logger.verbose(
+			req.nanoid,
+			'api/controllers/admin.controllers/createUser',
+			`User ${user.dataValues.email} created`
+		);
+
+		return res.status(201).json(
+			omit(user.dataValues, ['password'])
+		);
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/admin.controllers/createUser',
+			err.message
+		);
+
+		return res.status(400).json({ message: err.message });
+	}
+};
+
 module.exports = {
 	getTimezones,
 	postTimezone,
@@ -286,5 +319,6 @@ module.exports = {
 	putUserRole,
 	getUser,
 	getUsers,
-	deleteUser
+	deleteUser,
+	createUser
 };

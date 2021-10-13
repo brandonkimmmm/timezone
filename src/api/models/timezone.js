@@ -1,6 +1,6 @@
 const { Timezone } = require('../../db/models');
 const logger = require('../../utils/logger');
-const { isInteger, isString, isEmpty } = require('lodash');
+const { isInteger, isString, isEmpty, omit } = require('lodash');
 const { getCityTimezone } = require('../../utils/timezones');
 const { getById } = require('./user');
 
@@ -146,10 +146,12 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 
 	const country = data.country;
 
+	const givenData = omit(data, 'country');
+
 	const updateData = {};
 
-	for (const field in data) {
-		const value = data[field].toLowerCase().trim();
+	for (const field in givenData) {
+		const value = givenData[field].toLowerCase().trim();
 
 		switch (field) {
 		case 'updated_name':

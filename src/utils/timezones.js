@@ -21,6 +21,10 @@ const getCityTimezone = async (city, country) => {
 		foundCity = cityLookup[0];
 	}
 
+	if (!foundCity) {
+		throw new Error('Invalid city');
+	}
+
 	const timezone = foundCity.timezone;
 	const offset = `${DateTime.now().setZone(timezone).offset / 60}:00`;
 
@@ -30,7 +34,7 @@ const getCityTimezone = async (city, country) => {
 	};
 };
 
-const getCurrentTime = async (timezone) => {
+const getCurrentTime = (timezone) => {
 	return DateTime.now().setZone(timezone).toFormat('FFF');
 };
 
@@ -41,7 +45,7 @@ const formatTimezones = async (timezones) => {
 			city: timezone.city,
 			timezone: timezone.timezone,
 			offset: timezone.offset,
-			current_time: getCurrentTime(timezone)
+			current_time: getCurrentTime(timezone.timezone)
 		};
 	});
 };

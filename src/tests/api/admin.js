@@ -930,4 +930,84 @@ describe('Admin endpoints', () => {
 				});
 		});
 	});
+
+	describe('/POST admin/user', () => {
+		it('it should create a new user', (done) => {
+			chai.request(app)
+				.post('/admin/user')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ email: USERS.user.email, password: USERS.user.password, password_confirmation: USERS.user.password })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(201);
+					res.body.should.be.an('object');
+					res.body.should.have.property('id');
+					res.body.should.have.property('email');
+					res.body.should.have.property('role');
+					res.body.should.have.property('created_at');
+					res.body.should.have.property('updated_at');
+					res.body.should.not.have.property('password');
+					res.body.email.should.equal(USERS.user.email);
+					res.body.role.should.equal('user');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is not given', (done) => {
+			chai.request(app)
+				.post('/admin/user')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Missing headers');
+					done();
+				});
+		});
+
+		it('it should return 401 if token is invalid', (done) => {
+			chai.request(app)
+				.post('/admin/user')
+				.set('authorization', 'Bearer fasldvkas')
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+
+		it('it should return 400 if user already exists', (done) => {
+			chai.request(app)
+				.post('/admin/user')
+				.set('authorization', `Bearer ${USERS.admin.token}`)
+				.send({ email: USERS.user.email, password: USERS.user.password, password_confirmation: USERS.user.password })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(400);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal(`User ${USERS.user.email} already exists`);
+					done();
+				});
+		});
+
+		it('it should return 401 if token is for user', (done) => {
+			chai.request(app)
+				.post('/admin/user')
+				.set('authorization', `Bearer ${USERS.user.token}`)
+				.send({ email: USERS.user.email, password: USERS.user.password, password_confirmation: USERS.user.password })
+				.end((err, res) => {
+					should.not.exist(err);
+					res.should.have.status(401);
+					res.body.should.be.an('object');
+					res.body.should.have.property('message');
+					res.body.message.should.equal('Invalid token');
+					done();
+				});
+		});
+	});
 });

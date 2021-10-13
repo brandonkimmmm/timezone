@@ -1,10 +1,7 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, 'config', '.env') });
-
+const { PORT } = require('./config/constants');
 const logger = require('./utils/logger');
 const express = require('express');
 const app = express();
-const { PORT } = require('./config/constants');
 const { nanoid } = require('nanoid');
 const publicRouter = require('./api/routes/public.routes');
 const userRoutes = require('./api/routes/user.routes');

@@ -12,5 +12,6 @@ router.put('/admin/user/role', [ authenticate.validateJwtToken, validator.adminP
 router.get('/admin/user', [ authenticate.validateJwtToken, validator.adminGetUser ], adminControllers.getUser);
 router.delete('/admin/user', [ authenticate.validateJwtToken, validator.adminDeleteUser ], adminControllers.deleteUser);
 router.get('/admin/users', [ authenticate.validateJwtToken, validator.adminGetUsers ], adminControllers.getUsers);
+router.post('/admin/user', [ authenticate.validateJwtToken, validator.signup ], adminControllers.createUser);
 
 module.exports = router;
