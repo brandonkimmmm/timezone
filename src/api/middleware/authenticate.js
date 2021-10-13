@@ -5,6 +5,7 @@ const { pick } = require('lodash');
 const validateJwtToken = async (req, res, next) => {
 	const { authorization } = req.headers;
 
+	// If authorization header does not exist, throw an error
 	if (!authorization) {
 		logger.error(
 			req.nanoid,
@@ -17,6 +18,7 @@ const validateJwtToken = async (req, res, next) => {
 
 	const [ key, token ] = authorization.split(' ');
 
+	// Authorization value needs the Bearer prefix
 	if (key !== 'Bearer' || !token) {
 		logger.error(
 			req.nanoid,
@@ -28,9 +30,11 @@ const validateJwtToken = async (req, res, next) => {
 	}
 
 	try {
+		// Decoded JWT token will have id, email, and role
 		const decodedToken = await decodeToken(token);
 		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
 
+		// If the request is for an admin path, check if token is for admin user
 		if (req.path.includes('/admin') && decodedUser.role !== 'admin') {
 			return res.status(401).json({ message: 'Invalid token' });
 		}

@@ -30,6 +30,7 @@ const getByEmail = async (email, opts = {}) => {
 		throw new Error('Invalid email given');
 	}
 
+	// format given email (lowercase, trim)
 	const formattedEmail = email.toLowerCase().trim();
 
 	logger.debug(
@@ -75,6 +76,7 @@ const create = async (
 
 	const existingUser = await getByEmail(formattedEmail);
 
+	// If user exists with given email, throw an error
 	if (existingUser) {
 		throw new Error(`User ${email} already exists`);
 	}
@@ -104,6 +106,7 @@ const updateRole = async (
 		throw new Error('Invalid role given');
 	}
 
+	// format given role
 	const formattedRole = role.toLowerCase().trim();
 
 	if (!VALID_ROLES.includes(formattedRole)) {

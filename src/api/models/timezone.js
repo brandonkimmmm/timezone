@@ -17,6 +17,7 @@ const getUserTimezones = async (user_id, opts = {}) => {
 
 	const user = await getById(user_id, { raw: true });
 
+	// if user with given user_id is not found, throw an error
 	if (!user) {
 		throw new Error('User not found');
 	}
@@ -42,6 +43,7 @@ const getUserTimezone = async (user_id, name, opts = {}) => {
 
 	const user = await getById(user_id, { raw: true });
 
+	// if user with given user_id is not found, throw an error
 	if (!user) {
 		throw new Error('User not found');
 	}
@@ -80,6 +82,7 @@ const createTimezone = async (user_id, name, city, country, opts = {}) => {
 		throw new Error('Invalid city given');
 	}
 
+	// format name and city given (lower case, trim)
 	const formattedName = name.toLowerCase().trim();
 	const formattedCity = city.toLowerCase().trim();
 
@@ -100,6 +103,7 @@ const createTimezone = async (user_id, name, city, country, opts = {}) => {
 
 	const existingTimezone = await getUserTimezone(user_id, formattedName, { raw: true });
 
+	// if a user has timezone with the same name, throw an error
 	if (existingTimezone) {
 		throw new Error('Timezone with name already exists for user');
 	}
@@ -135,6 +139,7 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 
 	const existingTimezone = await getUserTimezone(user_id, name);
 
+	// if timezone does not exist, throw an error
 	if (!existingTimezone) {
 		throw new Error('Timezone not found');
 	}
@@ -149,6 +154,7 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 		switch (field) {
 		case 'updated_name':
 			if (value !== existingTimezone.name) {
+				// check if user already has a timezone with given name
 				const existingTimezone = await getUserTimezone(user_id, value, { raw: true });
 
 				if (existingTimezone) {
@@ -160,6 +166,7 @@ const updateUserTimezone = async (user_id, name, data = {}) => {
 			break;
 		case 'updated_city':
 			if (isString(value)) {
+				// Get timezone of city given
 				const {
 					timezone,
 					offset
@@ -205,6 +212,7 @@ const deleteUserTimezone = async (user_id, name) => {
 
 	const timezone = await getUserTimezone(user_id, formattedName);
 
+	// throw an error if timezone is not found
 	if (!timezone) {
 		throw new Error('Timezone not found');
 	}
