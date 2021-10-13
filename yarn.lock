@@ -3383,11 +3383,6 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-tzdata@^1.0.27:
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/tzdata/-/tzdata-1.0.27.tgz#382c58c96bdac458a16265423b3d7bef469059c4"
-  integrity sha512-08ISrzAQ4o9k4ht7M3UehIYNFdKcnO0Z1Pcv+vCcF3sE/W1JlsQ99+1pKwhC7amhzddwsK7PrZhMZHR+J0gH2w==
-
 umzug@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/umzug/-/umzug-2.3.0.tgz#0ef42b62df54e216b05dcaf627830a6a8b84a184"

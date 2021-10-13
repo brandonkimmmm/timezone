@@ -23,7 +23,6 @@
     "nanoid": "^3.1.29",
     "sequelize": "^6.6.5",
     "sqlite3": "^5.0.2",
-    "tzdata": "^1.0.27",
     "validator": "^13.6.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
