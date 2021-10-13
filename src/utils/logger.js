@@ -4,6 +4,7 @@ const { NODE_ENV } = require('../config/constants');
 const level = NODE_ENV === 'production' ? 'info' : 'debug';
 const { SPLAT } = require('triple-beam');
 const { isPlainObject } = require('lodash');
+const path = require('path');
 
 const formatObject = (param) => {
 	return isPlainObject(param) ? JSON.stringify(param) : param;
@@ -29,7 +30,7 @@ const logFormat = winston.format.combine(
 
 const transport = new DailyRotateFile({
 	filename: 'toptal-%DATE%.log',
-	dirname: '../../logs',
+	dirname: path.join(__dirname, '../../', 'logs'),
 	datePattern: 'YYYY-MM-DD-HH',
 	zippedArchive: true,
 	maxSize: '20m',
