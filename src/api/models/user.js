@@ -51,6 +51,16 @@ const getByEmail = async (email, opts = {}) => {
 	return user;
 };
 
+const getAll = async (opts = {}) => {
+	logger.debug(
+		'api/models/user/getAll'
+	);
+
+	const users = await User.findAll(opts);
+
+	return users;
+};
+
 const create = async (
 	email,
 	password,
@@ -98,7 +108,7 @@ const updateRole = async (
 		throw new Error('Invalid id given');
 	}
 
-	if (id === MASTER_ADMIN) {
+	if (id === MASTER_ADMIN.ID) {
 		throw new Error('Cannot update master admin role');
 	}
 
@@ -143,7 +153,7 @@ const deleteUser = async (id) => {
 		throw new Error('Invalid id given');
 	}
 
-	if (id === MASTER_ADMIN) {
+	if (id === MASTER_ADMIN.ID) {
 		throw new Error('Cannot delete master admin');
 	}
 
@@ -169,5 +179,6 @@ module.exports = {
 	getById,
 	create,
 	updateRole,
-	deleteUser
+	deleteUser,
+	getAll
 };

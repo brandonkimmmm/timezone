@@ -2,7 +2,7 @@ const chai = require('chai');
 const should = chai.should();
 const faker = require('faker');
 const { truncate } = require('../utils/db');
-const { getByEmail, getById, create, updateRole, deleteUser } = require('../../api/models/user');
+const { getByEmail, getById, create, updateRole, deleteUser, getAll } = require('../../api/models/user');
 const { createTimezone } = require('../../api/models/timezone');
 const { Timezone } = require('../../db/models');
 const { expect } = require('chai');
@@ -77,6 +77,24 @@ describe('User model', () => {
 			} catch (err) {
 				expect(err.message).to.eql('Invalid password given');
 			}
+		});
+	});
+
+	describe('User get all', () => {
+		it('it should get all user data', async () => {
+			const users = await getAll();
+
+			users.should.be.an('array');
+			users.should.have.length(1);
+			users[0].should.have.property('dataValues');
+			users[0].dataValues.should.be.an('object');
+			users[0].dataValues.should.have.property('email');
+			users[0].dataValues.should.have.property('id');
+			users[0].dataValues.should.have.property('password');
+			users[0].dataValues.should.have.property('created_at');
+			users[0].dataValues.should.have.property('updated_at');
+			users[0].dataValues.email.should.equal(USERS.user.email);
+			users[0].dataValues.password.should.not.equal(USERS.user.password);
 		});
 	});
 
