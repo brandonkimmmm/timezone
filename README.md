@@ -1,4 +1,4 @@
-# Toptal Project
+# Timezone Project
 
 ## Overview
 

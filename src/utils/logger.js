@@ -29,7 +29,7 @@ const logFormat = winston.format.combine(
 );
 
 const transport = new DailyRotateFile({
-	filename: 'toptal-%DATE%.log',
+	filename: 'timezone-%DATE%.log',
 	dirname: path.join(__dirname, '../../', 'logs'),
 	datePattern: 'YYYY-MM-DD-HH',
 	zippedArchive: true,
