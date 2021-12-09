@@ -14,6 +14,10 @@ import { getMockUser } from '../utils/mock';
 
 const should = chai.should();
 const USER = getMockUser();
+const TIMEZONE = {
+	city: 'new york',
+	name: 'my city new york'
+};
 
 describe('User model', () => {
 
@@ -231,53 +235,54 @@ describe('User model', () => {
 		});
 	});
 
-	// describe('User delete', () => {
-	// 	it('it should delete user and timezones for user', async () => {
-	// 		await createTimezone(USER.id, TIMEZONES.name, TIMEZONES.city);
+	describe('User delete', () => {
+		it('it should delete user and timezones for user', async () => {
+			await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
 
-	// 		const timezones = await Timezone.findAll({ where: { user_id: USER.id }, raw: true });
+			const user = await getById(USER.id);
+			const timezones = await user?.getTimezones();
 
-	// 		timezones.should.have.lengthOf(1);
+			timezones?.should.have.lengthOf(1);
 
-	// 		const user = await deleteUser(USER.id);
+			user?.should.be.an('object');
+			user?.should.have.property('dataValues');
+			user?.should.be.an('object');
+			user?.should.have.property('email');
+			user?.should.have.property('id');
+			user?.should.have.property('password');
+			user?.should.have.property('role');
+			user?.should.have.property('created_at');
+			user?.should.have.property('updated_at');
+			user?.email.should.equal(USER.email);
+			user?.id.should.equal(USER.id);
+			user?.role.should.equal('user');
 
-	// 		user.should.be.an('object');
-	// 		user.should.have.property('dataValues');
-	// 		user.should.be.an('object');
-	// 		user.should.have.property('email');
-	// 		user.should.have.property('id');
-	// 		user.should.have.property('password');
-	// 		user.should.have.property('role');
-	// 		user.should.have.property('created_at');
-	// 		user.should.have.property('updated_at');
-	// 		user.email.should.equal(USER.email);
-	// 		user.id.should.equal(USER.id);
-	// 		user.role.should.equal('user');
+			await user?.destroy();
 
-	// 		const deletedUser = await getById(USER.id);
-	// 		should.not.exist(deletedUser);
+			const deletedUser = await getById(USER.id);
+			should.not.exist(deletedUser);
 
-	// 		const userTimezones = await Timezone.findAll({ where: { user_id: USER.id }, raw: true });
+			const userTimezones = await Timezone.findOne({ where: { name: TIMEZONE.name }, raw: true });
 
-	// 		userTimezones.should.have.lengthOf(0);
-	// 	});
+			userTimezones?.should.have.lengthOf(0);
+		});
 
-	// 	it('it should throw an error if user does not exist', async () => {
-	// 		try {
-	// 			await deleteUser(USER.id);
-	// 			expect(true, 'promise should fail').eq(false);
-	// 		} catch (err) {
-	// 			expect(err instanceof Error ? err.message : '').to.eql('User not found');
-	// 		}
-	// 	});
+		it('it should throw an error if user does not exist', async () => {
+			try {
+				await deleteUser(USER.id);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql('User not found');
+			}
+		});
 
-	// 	it('it should throw an error if user id is 1', async () => {
-	// 		try {
-	// 			await deleteUser(1);
-	// 			expect(true, 'promise should fail').eq(false);
-	// 		} catch (err) {
-	// 			expect(err instanceof Error ? err.message : '').to.eql('Cannot delete master admin');
-	// 		}
-	// 	});
-	// });
+		it('it should throw an error if user id is 1', async () => {
+			try {
+				await deleteUser(1);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql('Cannot delete master admin');
+			}
+		});
+	});
 });
