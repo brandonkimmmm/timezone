@@ -1,5 +1,4 @@
 import { sequelize } from '.';
-import { hash } from '../../utils/bcrypt';
 import {
 	Model,
 	Optional,
@@ -9,6 +8,8 @@ import {
 	HasManyHasAssociationMixin
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
+import bcrypt from 'bcrypt';
+import { SALT_ROUNDS } from '../../config/constants';
 
 interface UserAttributes {
 	id: number;
@@ -27,6 +28,11 @@ export interface UserInstance extends Model<UserAttributes, UserCreationAttribut
 		getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
 		createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
 		hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
+
+		verifyPassword: (password: string) => Promise<boolean>;
+		prototype: {
+			verifyPassword: (password: string) => Promise<boolean>;
+		}
 	}
 
 const User = sequelize.define<UserInstance>(
@@ -52,14 +58,19 @@ const User = sequelize.define<UserInstance>(
 			defaultValue: 'user'
 		}
 	}, {
-		tableName: 'Users'
+		tableName: 'Users',
+		hooks: {
+			beforeCreate: async (user: UserInstance) => {
+				const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+				user.password = hashedPassword;
+			}
+		}
 	}
 );
 
-User.beforeCreate(async (user: UserInstance) => {
-	const hashedPassword = await hash(user.password);
-	user.password = hashedPassword;
-});
+User.prototype.verifyPassword = function (password: string) {
+	return bcrypt.compare(password, this.password);
+};
 
 User.hasMany(Timezone, {
 	foreignKey: 'user_id',

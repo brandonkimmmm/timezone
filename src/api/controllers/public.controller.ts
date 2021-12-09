@@ -1,8 +1,7 @@
 import logger from '../../utils/logger';
 import * as User from '../models/user';
 import { omit } from 'lodash';
-import { compare } from '../../utils/bcrypt';
-import { signToken} from '../../utils/jwt';
+import { signToken } from '../../utils/jwt';
 import { Request, Response } from 'express';
 
 export const getInfo = async (req: Request, res: Response) => {
@@ -62,7 +61,7 @@ export const login = async (req: Request, res: Response) => {
 			throw new Error('User not found');
 		}
 
-		const isValidPassword = await compare(password, user.password);
+		const isValidPassword = await user.verifyPassword(password);
 
 		if (!isValidPassword) {
 			throw new Error('Invalid password given');
