@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get('/user', authenticate.validateJwtToken, userControllers.get);
 router.get('/user/timezones', authenticate.validateJwtToken, userControllers.getTimezones);
-router.post('/user/timezone', [ authenticate.validateJwtToken, validator.postTimezone ], userControllers.postTimezone);
-router.put('/user/timezone', [ authenticate.validateJwtToken, validator.putTimezone ], userControllers.putTimezone);
-router.delete('/user/timezone', [ authenticate.validateJwtToken, validator.deleteTimezone ], userControllers.deleteTimezone);
+router.post('/user/timezone', [ authenticate.validateJwtToken, validator.postUserTimezone ], userControllers.postTimezone);
+router.put('/user/timezone', [ authenticate.validateJwtToken, validator.putUserTimezone ], userControllers.putTimezone);
+router.delete('/user/timezone', [ authenticate.validateJwtToken, validator.deleteUserTimezone ], userControllers.deleteTimezone);
 
 export default router;

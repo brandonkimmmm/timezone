@@ -15,11 +15,7 @@ export const getById = async (id: number) => {
 		id
 	);
 
-	const user = await User.findOne({
-		where: {
-			id
-		}
-	});
+	const user = await User.findByPk(id);
 
 	return user;
 };

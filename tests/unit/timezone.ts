@@ -30,8 +30,8 @@ const USERS = {
 };
 
 const TIMEZONES = {
-	city: 'New York',
-	name: 'My city new york'
+	city: 'new york',
+	name: 'my city new york'
 };
 
 describe('Timezone model', () => {

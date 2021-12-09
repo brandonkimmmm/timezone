@@ -1,10 +1,7 @@
-import { all } from 'bluebird';
 import Timezone from '../../src/db/models/timezone';
 import User from '../../src/db/models/user';
 
 export const truncate = async () => {
-	await all([
-		User.destroy({ truncate: true }),
-		Timezone.destroy({ truncate: true })
-	]);
+	await Timezone.destroy({ truncate: true, cascade: true });
+	await User.destroy({ truncate: true, cascade: true });
 };

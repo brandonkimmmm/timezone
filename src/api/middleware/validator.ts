@@ -1,254 +1,190 @@
 import Joi from 'joi';
-import { PASSWORD_REGEX } from '../../config/constants';
 import { Request, Response, NextFunction } from 'express';
+import {
+	UserSchema,
+	TimezoneSchema
+} from '../../utils/schemas';
 
-export const signup = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		email: Joi.string()
-			.email()
-			.required(),
-		password: Joi.string()
-			.pattern(PASSWORD_REGEX)
-			.required(),
-		password_confirmation: Joi.ref('password')
-	});
-
+export const postSignup = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			email: UserSchema.extract('email').required(),
+			password: UserSchema.extract('password').required(),
+			password_confirmation: Joi.required().valid(Joi.ref('password'))
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		email: Joi.string()
-			.email()
-			.required(),
-		password: Joi.string()
-			.pattern(PASSWORD_REGEX)
-			.required()
-	});
-
+export const postLogin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			email: UserSchema.extract('email').required(),
+			password: UserSchema.extract('password')
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const postTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		name: Joi.string()
-			.required()
-			.min(2),
-		city: Joi.string()
-			.required()
-			.min(2),
-		country: Joi.string()
-			.length(2)
-	});
-
+export const postUserTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			name: TimezoneSchema.extract('name').required(),
+			city: TimezoneSchema.extract('city').required(),
+			country: TimezoneSchema.extract('country')
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const putTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		name: Joi.string()
-			.required()
-			.min(2),
-		updated_name: Joi.string()
-			.required()
-			.min(2),
-		updated_city: Joi.string()
-			.required()
-			.min(2),
-		country: Joi.string()
-			.length(2)
-	});
-
+export const putUserTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			name: TimezoneSchema.extract('name').required(),
+			country: TimezoneSchema.extract('country'),
+			updated_name: TimezoneSchema.extract('name').required(),
+			updated_city: TimezoneSchema.extract('city').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const deleteTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		name: Joi.string()
-			.required()
-			.min(2)
-	});
-
+export const deleteUserTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			name: TimezoneSchema.extract('name').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminGetTimezones = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-	});
-
+export const getAdminTimezones = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.query);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required()
+		});
+
+		req.query = await schema.validateAsync(req.query);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminPostTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-		name: Joi.string()
-			.required()
-			.min(2),
-		city: Joi.string()
-			.required()
-			.min(2),
-		country: Joi.string()
-			.length(2)
-	});
-
+export const postAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required(),
+			name: TimezoneSchema.extract('name').required(),
+			city: TimezoneSchema.extract('city').required(),
+			country: TimezoneSchema.extract('country')
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminPutTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-		name: Joi.string()
-			.required()
-			.min(2),
-		updated_name: Joi.string()
-			.required()
-			.min(2),
-		updated_city: Joi.string()
-			.required()
-			.min(2),
-		country: Joi.string()
-			.length(2)
-	});
-
+export const putAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required(),
+			name: TimezoneSchema.extract('name').required(),
+			country: TimezoneSchema.extract('country'),
+			updated_name: TimezoneSchema.extract('name').required(),
+			updated_city: TimezoneSchema.extract('city').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminDeleteTimezone = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-		name: Joi.string()
-			.required()
-			.min(2)
-	});
-
+export const deleteAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required(),
+			name: TimezoneSchema.extract('name').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminPutUserRole = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-		role: Joi.string()
-			.required()
-			.valid('admin', 'user')
-	});
-
+export const putAdminUserRole = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required(),
+			role: UserSchema.extract('role').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminGetUser = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-	});
-
+export const getAdminUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.query);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required()
+		});
+
+		req.query = await schema.validateAsync(req.query);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminGetUsers = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		role: Joi.string()
-			.valid('admin', 'user')
-	});
-
+export const getAdminUsers = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.query);
+		const schema = Joi.object({
+			role: UserSchema.extract('role')
+		});
+
+		req.query = await schema.validateAsync(req.query);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
-export const adminDeleteUser = async (req: Request, res: Response, next: NextFunction) => {
-	const schema = Joi.object({
-		user_id: Joi.number()
-			.integer()
-			.min(0)
-			.not(0)
-			.required(),
-	});
-
+export const deleteAdminUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		await schema.validateAsync(req.body);
+		const schema = Joi.object({
+			user_id: UserSchema.extract('id').required()
+		});
+
+		req.body = await schema.validateAsync(req.body);
 		next();
 	} catch (err) {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });

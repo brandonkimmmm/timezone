@@ -2,11 +2,11 @@ import logger from '../../utils/logger';
 import * as Timezone from '../models/timezone';
 import * as User from '../models/user';
 import { formatTimezones } from '../../utils/timezones';
-import { isString, omit } from 'lodash';
+import { omit } from 'lodash';
 import { Request, Response } from 'express';
 
 export const getTimezones = async (req: Request, res: Response) => {
-	const user_id = isString(req.query.user_id) ? parseInt(req.query.user_id) : 0;
+	const { user_id } = req.query as any;
 
 	logger.info(
 		req.nanoid,
@@ -171,7 +171,7 @@ export const putUserRole = async (req: Request, res: Response) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
-	const user_id = isString(req.query.user_id) ? parseInt(req.query.user_id) : 0;
+	const { user_id } = req.query as any;
 
 	logger.info(
 		req.nanoid,
