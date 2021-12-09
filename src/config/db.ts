@@ -7,7 +7,7 @@ interface DbConfig {
 const config: DbConfig = {
 	development: {
 		dialect: 'sqlite',
-		storage: './database.sqlite3',
+		storage: './database-dev.sqlite3',
 		define: {
 			timestamps: true,
 			underscored: true,
