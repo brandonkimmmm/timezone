@@ -1,44 +1,29 @@
 import { expect } from 'chai';
-import faker from 'faker';
 import { signToken, decodeToken } from '../../src/utils/jwt';
 import { getCityTimezone } from '../../src/utils/timezones';
+import { getMockUser } from '../utils/mock';
 
-const USERS = {
-	user: {
-		id: 1,
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'user',
-		token: ''
-	},
-	admin: {
-		id: 2,
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'admin',
-		token: ''
-	}
-};
+const USER = getMockUser();
 
 describe('Utils functions', () => {
 	describe('JWT Sign', () => {
 		it('it should return signed token', async () => {
-			const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
+			const token = await signToken(USER.id, USER.email, USER.role);
 			token.should.be.a('string');
-			USERS.user.token = token;
+			USER.token = token;
 		});
 	});
 
 	describe('JWT Decode', () => {
 		it('it should return decoded token', async () => {
-			const decodedToken = await decodeToken(USERS.user.token);
+			const decodedToken = await decodeToken(USER.token);
 			decodedToken?.should.be.an('object');
 			decodedToken?.should.have.property('email');
 			decodedToken?.should.have.property('role');
 			decodedToken?.should.have.property('id');
-			decodedToken?.email.should.equal(USERS.user.email);
-			decodedToken?.role.should.equal(USERS.user.role);
-			decodedToken?.id.should.equal(USERS.user.id);
+			decodedToken?.email.should.equal(USER.email);
+			decodedToken?.role.should.equal(USER.role);
+			decodedToken?.id.should.equal(USER.id);
 		});
 
 		it('it should throw an error if token is invalid', async () => {

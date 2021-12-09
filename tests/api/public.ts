@@ -1,26 +1,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../../src/app';
-import faker from 'faker';
 import { truncate } from '../utils/db';
 import { name, version } from '../../package.json';
+import { getMockUser } from '../utils/mock';
 
 const should = chai.should();
 
 chai.use(chaiHttp);
 
-const USERS = {
-	user: {
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'user'
-	},
-	admin: {
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'admin'
-	}
-};
+const USER = getMockUser();
 
 describe('Public endpoints', () => {
 
@@ -52,9 +41,9 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/signup')
 				.send({
-					email: USERS.user.email,
-					password: USERS.user.password,
-					password_confirmation: USERS.user.password
+					email: USER.email,
+					password: USER.password,
+					password_confirmation: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -64,8 +53,8 @@ describe('Public endpoints', () => {
 					res.body.should.have.property('id');
 					res.body.should.have.property('role');
 					res.body.should.not.have.property('password');
-					res.body.email.should.equal(USERS.user.email);
-					res.body.role.should.equal(USERS.user.role);
+					res.body.email.should.equal(USER.email);
+					res.body.role.should.equal(USER.role);
 					done();
 				});
 		});
@@ -75,8 +64,8 @@ describe('Public endpoints', () => {
 				.post('/signup')
 				.send({
 					email: 'nope',
-					password: USERS.user.password,
-					password_confirmation: USERS.user.password
+					password: USER.password,
+					password_confirmation: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -92,7 +81,7 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/signup')
 				.send({
-					email: USERS.user.email,
+					email: USER.email,
 					password: 'hi',
 					password_confirmation: 'hi'
 				})
@@ -110,8 +99,8 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/signup')
 				.send({
-					email: USERS.user.email,
-					password: USERS.user.password,
+					email: USER.email,
+					password: USER.password,
 					password_confirmation: 'nope1avasdf23'
 				})
 				.end((err, res) => {
@@ -128,16 +117,16 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/signup')
 				.send({
-					email: USERS.user.email,
-					password: USERS.user.password,
-					password_confirmation: USERS.user.password
+					email: USER.email,
+					password: USER.password,
+					password_confirmation: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal(`User ${USERS.user.email} already exists`);
+					res.body.message.should.equal(`User ${USER.email} already exists`);
 					done();
 				});
 		});
@@ -148,8 +137,8 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/login')
 				.send({
-					email: USERS.user.email,
-					password: USERS.user.password
+					email: USER.email,
+					password: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -165,7 +154,7 @@ describe('Public endpoints', () => {
 				.post('/login')
 				.send({
 					email: 'nope',
-					password: USERS.user.password
+					password: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -181,7 +170,7 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/login')
 				.send({
-					email: USERS.user.email,
+					email: USER.email,
 					password: 'hi',
 				})
 				.end((err, res) => {
@@ -198,8 +187,8 @@ describe('Public endpoints', () => {
 			chai.request(app)
 				.post('/login')
 				.send({
-					email: faker.internet.exampleEmail(),
-					password: USERS.user.password
+					email: getMockUser().email,
+					password: USER.password
 				})
 				.end((err, res) => {
 					should.not.exist(err);

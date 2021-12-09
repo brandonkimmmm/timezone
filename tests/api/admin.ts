@@ -1,33 +1,21 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../../src/app';
-import faker from 'faker';
 import { create } from '../../src/api/models/user';
 import { signToken } from '../../src/utils/jwt';
 import { truncate } from '../utils/db';
+import { getMockUser } from '../utils/mock';
 
 const should = chai.should();
 
 chai.use(chaiHttp);
 
 const USERS = {
-	user: {
-		id: 0,
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'user',
-		token: ''
-	},
-	admin: {
-		id: 0,
-		email: faker.internet.exampleEmail().toLowerCase(),
-		password: faker.internet.password(10, false, /^[a-zA-Z0-9]$/),
-		role: 'admin',
-		token: ''
-	}
+	user: getMockUser(),
+	admin: getMockUser('admin')
 };
 
-const TIMEZONES = {
+const TIMEZONE = {
 	city: 'new york',
 	name: 'my city new york'
 };
@@ -58,8 +46,8 @@ describe('Admin endpoints', () => {
 				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
 					user_id: USERS.user.id,
-					name: TIMEZONES.name,
-					city: TIMEZONES.city
+					name: TIMEZONE.name,
+					city: TIMEZONE.city
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -71,8 +59,8 @@ describe('Admin endpoints', () => {
 					res.body.should.have.property('timezone');
 					res.body.should.have.property('offset');
 					res.body.user_id.should.equal(USERS.user.id);
-					res.body.city.should.equal(TIMEZONES.city.toLowerCase());
-					res.body.name.should.equal(TIMEZONES.name.toLowerCase());
+					res.body.city.should.equal(TIMEZONE.city);
+					res.body.name.should.equal(TIMEZONE.name);
 					res.body.timezone.should.equal('America/New_York');
 					res.body.offset.should.equal('-5:00');
 					done();
@@ -145,8 +133,8 @@ describe('Admin endpoints', () => {
 				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
 					user_id: USERS.user.id,
-					name: TIMEZONES.name,
-					city: TIMEZONES.city
+					name: TIMEZONE.name,
+					city: TIMEZONE.city
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -164,8 +152,8 @@ describe('Admin endpoints', () => {
 				.set('authorization', `Bearer ${USERS.admin.token}`)
 				.send({
 					user_id: 99999,
-					name: TIMEZONES.name,
-					city: TIMEZONES.city
+					name: TIMEZONE.name,
+					city: TIMEZONE.city
 				})
 				.end((err, res) => {
 					should.not.exist(err);
@@ -193,8 +181,8 @@ describe('Admin endpoints', () => {
 					res.body[0].should.have.property('timezone');
 					res.body[0].should.have.property('current_time');
 					res.body[0].should.have.property('offset');
-					res.body[0].name.should.equal(TIMEZONES.name.toLowerCase());
-					res.body[0].city.should.equal(TIMEZONES.city.toLowerCase());
+					res.body[0].name.should.equal(TIMEZONE.name);
+					res.body[0].city.should.equal(TIMEZONE.city);
 					res.body[0].timezone.should.equal('America/New_York');
 					res.body[0].offset.should.equal('-5:00');
 					done();
@@ -382,7 +370,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
+				.send({ user_id: USERS.user.id, name: TIMEZONE.name, updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(200);
@@ -398,8 +386,8 @@ describe('Admin endpoints', () => {
 					res.body.timezone.should.equal('America/Los_Angeles');
 					res.body.offset.should.equal('-8:00');
 
-					TIMEZONES.name = res.body.name;
-					TIMEZONES.city = res.body.city;
+					TIMEZONE.name = res.body.name;
+					TIMEZONE.city = res.body.city;
 					done();
 				});
 		});
@@ -408,7 +396,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.send({ user_id: USERS.user.id, name: TIMEZONE.name, updated_name: TIMEZONE.name, updated_city: TIMEZONE.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -423,7 +411,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.user.id, name: TIMEZONES.name, updated_name: 'another name', updated_city: 'nope', country: 'US'})
+				.send({ user_id: USERS.user.id, name: TIMEZONE.name, updated_name: 'another name', updated_city: 'nope', country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -480,7 +468,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: 99999, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.send({ user_id: 99999, name: TIMEZONE.name, updated_name: TIMEZONE.name, updated_city: TIMEZONE.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -495,7 +483,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.admin.id, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.send({ user_id: USERS.admin.id, name: TIMEZONE.name, updated_name: TIMEZONE.name, updated_city: TIMEZONE.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -510,7 +498,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.put('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ user_id: USERS.user.token, name: TIMEZONES.name, updated_name: TIMEZONES.name, updated_city: TIMEZONES.city, country: 'US'})
+				.send({ user_id: USERS.user.token, name: TIMEZONE.name, updated_name: TIMEZONE.name, updated_city: TIMEZONE.city, country: 'US'})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
@@ -527,7 +515,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.delete('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.admin.id, name: TIMEZONES.name })
+				.send({ user_id: USERS.admin.id, name: TIMEZONE.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -542,7 +530,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.delete('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: USERS.user.id, name: TIMEZONES.name })
+				.send({ user_id: USERS.user.id, name: TIMEZONE.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(200);
@@ -553,8 +541,8 @@ describe('Admin endpoints', () => {
 					res.body.should.have.property('timezone');
 					res.body.should.have.property('offset');
 					res.body.user_id.should.equal(USERS.user.id);
-					res.body.city.should.equal(TIMEZONES.city);
-					res.body.name.should.equal(TIMEZONES.name);
+					res.body.city.should.equal(TIMEZONE.city);
+					res.body.name.should.equal(TIMEZONE.name);
 					res.body.timezone.should.equal('America/Los_Angeles');
 					res.body.offset.should.equal('-8:00');
 					done();
@@ -592,7 +580,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.delete('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.admin.token}`)
-				.send({ user_id: 99999, name: TIMEZONES.name })
+				.send({ user_id: 99999, name: TIMEZONE.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
@@ -607,7 +595,7 @@ describe('Admin endpoints', () => {
 			chai.request(app)
 				.delete('/admin/user/timezone')
 				.set('authorization', `Bearer ${USERS.user.token}`)
-				.send({ user_id: USERS.user.id, name: TIMEZONES.name })
+				.send({ user_id: USERS.user.id, name: TIMEZONE.name })
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(401);
