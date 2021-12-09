@@ -214,6 +214,7 @@ describe('User model', () => {
 
 		it('it should throw an error if invalid role is given', async () => {
 			try {
+				// @ts-expect-error: Testing invalid role passed
 				await updateRole(USERS.user.id, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {

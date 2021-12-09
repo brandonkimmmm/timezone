@@ -1,4 +1,4 @@
-import User from '../../db/models/user';
+import User, { Role } from '../../db/models/user';
 import logger from '../../utils/logger';
 import { isString, isInteger, isEmpty } from 'lodash';
 import validator from 'validator';
@@ -61,7 +61,7 @@ export const getAll = async (opts = {}) => {
 export const create = async (
 	email: string,
 	password: string,
-	role?: string
+	role: Role = 'user'
 ) => {
 	if (!isString(email) || !validator.isEmail(email)) {
 		throw new Error('Invalid email given');
@@ -92,7 +92,7 @@ export const create = async (
 	const user = await User.create({
 		email: formattedEmail,
 		password,
-		role: role ||= undefined
+		role: role ||= 'user'
 	});
 
 	return user;
@@ -100,7 +100,7 @@ export const create = async (
 
 export const updateRole = async (
 	id: number,
-	role: string
+	role: Role = 'user'
 ) => {
 	if (!isInteger(id) || id <= 0) {
 		throw new Error('Invalid id given');
@@ -114,9 +114,7 @@ export const updateRole = async (
 		throw new Error('Invalid role given');
 	}
 
-	const formattedRole = role.toLowerCase().trim();
-
-	if (!VALID_ROLES.includes(formattedRole)) {
+	if (!VALID_ROLES.includes(role)) {
 		throw new Error('Invalid role given');
 	}
 
@@ -125,7 +123,7 @@ export const updateRole = async (
 		'id:',
 		id,
 		'role:',
-		formattedRole
+		role
 	);
 
 	const user = await getById(id);
@@ -134,12 +132,12 @@ export const updateRole = async (
 		throw new Error('User not found');
 	}
 
-	if (user.role === formattedRole) {
-		throw new Error(`User already has role ${formattedRole}`);
+	if (user.role === role) {
+		throw new Error(`User already has role ${role}`);
 	}
 
 	await user.update({
-		role: formattedRole
+		role
 	}, { fields: ['role'] });
 
 	return user;

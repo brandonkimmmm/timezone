@@ -9,13 +9,15 @@ import {
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
-import { SALT_ROUNDS } from '../../config/constants';
+import { SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
+
+export type Role = 'admin' | 'user';
 
 interface UserAttributes {
 	id: number;
 	email: string;
 	password: string;
-	role: string;
+	role: Role
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
@@ -53,7 +55,7 @@ const User = sequelize.define<UserInstance>(
 			allowNull: false
 		},
 		role: {
-			type: DataTypes.STRING,
+			type: DataTypes.ENUM(...VALID_ROLES),
 			allowNull: false,
 			defaultValue: 'user'
 		}
