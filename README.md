@@ -5,10 +5,8 @@
 This project creates an API server that allows users to signup, login, and perform CRUD operations for different timezones. A user will be able to get the current time of all timezones created. In addition, a user can be upgraded to an admin role. An admin will be able to perform CRUD operations on both users and user timezones.
 
 ## Prerequistes
-- Node v16
+- Node v17
 - yarn
-
-
 
 ## Getting started
 
@@ -24,17 +22,60 @@ This project creates an API server that allows users to signup, login, and perfo
 		PORT= // Port to run server on. Defaults to 8080
 		SALT_ROUNDS= // Salt rounds for bcrypt hashing. Defaults to 10
 		JWT_SECRET= // Secret key to create JWT tokens. Defaults to shhh
-		MASTER_ADMIN_ID= // Master user account ID. Defaults to 1
 		MASTER_ADMIN_EMAIL= // Master user account email. No default
 		MASTER_ADMIN_PASSWORD= // Master user password. Defaults to password123
 	```
 3. Run DB migrations and seeders
 	``` bash
-		node_modules/.bin/sequelize db:migrate && node_modules/.bin/sequelize db:seed:all
+		npx sequelize db:migrate && npx sequelize db:seed:all
 	```
-4. Run the server
+4. Build typescript application
+	``` bash
+		yarn build
+	```
+5. Run the server
 	``` bash
 		yarn start
+	```
+
+## Running in Dev Mode
+
+1. Configure ENV values
+   1. Create a file called `.env` in `src/config` (Use `.env.example` as a template)
+   2. Add your values to the required ENV variables
+	``` bash
+		NODE_ENV= // Node ENV to run server on. Defaults to development
+		PORT= // Port to run server on. Defaults to 8080
+		SALT_ROUNDS= // Salt rounds for bcrypt hashing. Defaults to 10
+		JWT_SECRET= // Secret key to create JWT tokens. Defaults to shhh
+		MASTER_ADMIN_EMAIL= // Master user account email. No default
+		MASTER_ADMIN_PASSWORD= // Master user password. Defaults to password123
+	```
+2. Run DB migrations and seeders
+	``` bash
+		npx sequelize db:migrate && npx sequelize db:seed:all
+	```
+3. Run typescript application
+	``` bash
+		yarn dev
+	```
+
+## Testing
+
+1. Configure ENV values
+   1. Create a file called `.env` in `src/config` (Use `.env.example` as a template)
+   2. Add your values to the required ENV variables
+	``` bash
+		NODE_ENV= // Node ENV to run server on. Defaults to development
+		PORT= // Port to run server on. Defaults to 8080
+		SALT_ROUNDS= // Salt rounds for bcrypt hashing. Defaults to 10
+		JWT_SECRET= // Secret key to create JWT tokens. Defaults to shhh
+		MASTER_ADMIN_EMAIL= // Master user account email. No default
+		MASTER_ADMIN_PASSWORD= // Master user password. Defaults to password123
+	```
+2. Run Tests
+	``` bash
+		yarn test
 	```
 
 ## Libraries Used
@@ -48,11 +89,22 @@ This project creates an API server that allows users to signup, login, and perfo
 - lodash v4.17.21
 - luxon v2.0.2
 - nanoid v3.1.29
-- sequelize v6.6.5
+- sequelize v6.11.0
 - sqlite3 v5.0.2
 - validator v13.6.0
 - winston v3.3.3
 - winston-daily-rotate-file v4.5.5
+
+### Dev Dependencies
+- chai v4.3.4
+- chai-http v4.3.0
+- eslint v8.4.1
+- faker v5.5.3
+- mocha v9.1.2
+- nodemon v2.0.13
+- sequelize-cli v6.2.0
+- ts-node v10.4.0
+- typescript v4.5.2
 
 ## Endpoints
 

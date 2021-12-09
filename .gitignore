@@ -3,3 +3,4 @@
 database.sqlite3
 :memory
 /logs
+build
