@@ -17,7 +17,7 @@ export const getTimezones = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const timezones = await Timezone.getUserTimezones(user_id);
+		const timezones = await Timezone.getUserTimezones(user_id, { raw: true });
 		const formattedTimezones = await formatTimezones(timezones);
 
 		return res.json(formattedTimezones);
@@ -182,13 +182,16 @@ export const getUser = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.getUserById(user_id);
+		const user = await User.getUserById(
+			user_id,
+			{ raw: true, attributes: { exclude: ['password'] }}
+		);
 
 		if (!user) {
 			throw new Error('User not found');
 		}
 
-		return res.json(omit(user.toJSON(), ['password']));
+		return res.json(user);
 	} catch (err) {
 		logger.error(
 			req.nanoid,

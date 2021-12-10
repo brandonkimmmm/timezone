@@ -3,7 +3,6 @@ import * as User from '../models/user';
 import * as Timezone from '../models/timezone';
 import { formatTimezones } from '../../utils/timezones';
 import { Request, Response } from 'express';
-import { omit } from 'lodash';
 
 export const get = async (req: Request, res: Response) => {
 	const { email } = req.user;
@@ -16,13 +15,16 @@ export const get = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.getUserByEmail(email);
+		const user = await User.getUserByEmail(
+			email,
+			{ raw: true, attributes: { exclude: ['password'] }}
+		);
 
 		if (!user) {
 			throw new Error('User not found');
 		}
 
-		return res.json(omit(user.toJSON(), ['password']));
+		return res.json(user);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
@@ -45,7 +47,7 @@ export const getTimezones = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const timezones = await Timezone.getUserTimezones(id);
+		const timezones = await Timezone.getUserTimezones(id, { raw: true });
 		const formattedTimezones = await formatTimezones(timezones);
 
 		return res.json(formattedTimezones);
