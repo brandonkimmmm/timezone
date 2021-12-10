@@ -5,10 +5,14 @@ import * as validator from '../middleware/validator';
 const router = express.Router();
 
 router.use(authenticate.validateJwtToken);
-router.get('/user', userControllers.get);
-router.get('/user/timezones', userControllers.getTimezones);
-router.post('/user/timezone', validator.postUserTimezone, userControllers.postTimezone);
-router.put('/user/timezone', validator.putUserTimezone, userControllers.putTimezone);
-router.delete('/user/timezone', validator.deleteUserTimezone, userControllers.deleteTimezone);
+
+router.get('/', userControllers.get);
+
+router.route('/timezone')
+	.post(validator.postUserTimezone, userControllers.postTimezone)
+	.put(validator.putUserTimezone, userControllers.putTimezone)
+	.delete(validator.deleteUserTimezone, userControllers.deleteTimezone);
+
+router.get('/timezones', userControllers.getTimezones);
 
 export default router;

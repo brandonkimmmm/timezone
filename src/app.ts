@@ -32,8 +32,8 @@ app.use(async (req, res, next) => {
 });
 
 app.use(publicRouter);
-app.use(userRouter);
-app.use(adminRouter);
+app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 app.use(async (req, res) => {
 	return res.status(400).json({

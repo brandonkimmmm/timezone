@@ -36,7 +36,7 @@ export const validateJwtToken = async (req: Request, res: Response, next: NextFu
 		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
 
 		// If the request is for an admin path, check if token is for admin user
-		if (req.path.includes('/admin') && decodedUser.role !== 'admin') {
+		if (req.originalUrl.includes('/admin') && decodedUser.role !== 'admin') {
 			return res.status(401).json({ message: 'Invalid token' });
 		}
 
