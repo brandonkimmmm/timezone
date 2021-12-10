@@ -10,7 +10,7 @@ import {
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
-import { SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
+import { PASSWORD_REGEX, SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
 
 export type Role = 'admin' | 'user';
 
@@ -51,11 +51,18 @@ const User = sequelize.define<UserInstance>(
 		email: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			unique: true
+			unique: true,
+			validate: {
+				isLowercase: true,
+				isEmail: true
+			}
 		},
 		password: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				is: PASSWORD_REGEX
+			}
 		},
 		role: {
 			type: DataTypes.ENUM(...VALID_ROLES),
