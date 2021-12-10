@@ -2,7 +2,8 @@ import { sequelize } from '.';
 import {
 	DataTypes,
 	Model,
-	Optional
+	Optional,
+	FindOptions
 } from 'sequelize';
 
 interface TimezoneAttributes {
@@ -12,6 +13,8 @@ interface TimezoneAttributes {
 	timezone: string;
 	offset: string;
 }
+
+export type FindTimezoneOpts = FindOptions<TimezoneAttributes>
 
 interface TimezoneCreationAttributes extends Optional<TimezoneAttributes, 'id'> {}
 

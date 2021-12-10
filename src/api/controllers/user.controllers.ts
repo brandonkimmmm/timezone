@@ -83,7 +83,7 @@ export const postTimezone = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const timezone = await Timezone.createTimezone(id, name, city, country);
+		const timezone = await Timezone.createUserTimezone(id, name, city, country);
 
 		return res.status(201).json(timezone.toJSON());
 	} catch (err) {

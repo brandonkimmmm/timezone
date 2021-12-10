@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 import { truncate } from '../utils/db';
-import { createTimezone } from '../../src/api/models/timezone';
+import { createUserTimezone } from '../../src/api/models/timezone';
 import {
 	createUser,
 	getUserByEmail,
@@ -237,7 +237,7 @@ describe('User Helper Functions', () => {
 
 	describe('#deleteUser', () => {
 		it('it should delete user and timezones for user', async () => {
-			await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
+			await createUserTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
 
 			const user = await getUserById(USER.id);
 			const timezones = await user?.getTimezones();

@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { createUser } from '../../src/api/models/user';
 import { truncate } from '../utils/db';
 import {
-	createTimezone,
+	createUserTimezone,
 	getUserTimezone,
 	getUserTimezones,
 	updateUserTimezone,
@@ -19,7 +19,7 @@ const TIMEZONE = {
 	name: 'my city new york'
 };
 
-describe('Timezone model', () => {
+describe('Timezone Helper Functions', () => {
 	before(async () => {
 		await truncate();
 		const user = await createUser(USER.email, USER.password);
@@ -30,9 +30,9 @@ describe('Timezone model', () => {
 		await truncate();
 	});
 
-	describe('Timezone create', () => {
+	describe('#createUserTimezone', () => {
 		it('it should create a timezone for user', async () => {
-			const timezone = await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
+			const timezone = await createUserTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
 
 			timezone.should.be.an('object');
 			timezone.should.have.property('dataValues');
@@ -51,7 +51,7 @@ describe('Timezone model', () => {
 
 		it('it should throw an error if timezone name exists', async () => {
 			try {
-				await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
+				await createUserTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Timezone with name already exists for user');
@@ -60,7 +60,7 @@ describe('Timezone model', () => {
 
 		it('it should throw an error if invalid city is given', async () => {
 			try {
-				await createTimezone(USER.id, TIMEZONE.name, 'nope');
+				await createUserTimezone(USER.id, TIMEZONE.name, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Invalid city');
@@ -69,7 +69,7 @@ describe('Timezone model', () => {
 
 		it('it should throw an error if user does not exist', async () => {
 			try {
-				await createTimezone(9999999, TIMEZONE.name, TIMEZONE.city);
+				await createUserTimezone(9999999, TIMEZONE.name, TIMEZONE.city);
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
@@ -77,7 +77,7 @@ describe('Timezone model', () => {
 		});
 	});
 
-	describe('Timezone get', () => {
+	describe('#getUserTimezone', () => {
 		it('it should get a timezone for user', async () => {
 			const timezone = await getUserTimezone(USER.id, TIMEZONE.name);
 
@@ -109,8 +109,8 @@ describe('Timezone model', () => {
 		});
 	});
 
-	describe('Timezone get all', () => {
-		it('it should get all TIMEZONE for user', async () => {
+	describe('#getUserTimezones', () => {
+		it('it should get all timezones for user', async () => {
 			const timezone = await getUserTimezones(USER.id);
 
 			timezone.should.be.an('array');
@@ -137,7 +137,7 @@ describe('Timezone model', () => {
 		});
 	});
 
-	describe('Timezone update', () => {
+	describe('#updateUserTimezone', () => {
 		it('it should update an existing timezone for user', async () => {
 			const timezone = await updateUserTimezone(USER.id, TIMEZONE.name, { updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US' });
 
@@ -187,7 +187,7 @@ describe('Timezone model', () => {
 		});
 	});
 
-	describe('Timezone delete', () => {
+	describe('#deleteUserTimezone', () => {
 		it('it should delete an existing timezone for user', async () => {
 			const timezone = await deleteUserTimezone(USER.id, TIMEZONE.name);
 

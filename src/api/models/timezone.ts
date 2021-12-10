@@ -2,6 +2,7 @@ import logger from '../../utils/logger';
 import { isInteger, isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../../utils/timezones';
 import { getUserById } from './user';
+import { FindTimezoneOpts } from '../../db/models/timezone';
 
 interface Opts {
 	country?: string | null;
@@ -17,7 +18,10 @@ interface UpdateData {
 	timezone?: string;
 }
 
-export const getUserTimezones = async (user_id: number) => {
+export const getUserTimezones = async (
+	user_id: number,
+	opts: FindTimezoneOpts = {}
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -35,12 +39,16 @@ export const getUserTimezones = async (user_id: number) => {
 		throw new Error('User not found');
 	}
 
-	const timezones = await user.getTimezones();
+	const timezones = await user.getTimezones(opts);
 
 	return timezones;
 };
 
-export const getUserTimezone = async (user_id: number, name: string) => {
+export const getUserTimezone = async (
+	user_id: number,
+	name: string,
+	opts: FindTimezoneOpts = {}
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -68,13 +76,19 @@ export const getUserTimezone = async (user_id: number, name: string) => {
 	const [ timezone ] = await user.getTimezones({
 		where: {
 			name: formattedName
-		}
+		},
+		...opts
 	});
 
 	return timezone;
 };
 
-export const createTimezone = async (user_id: number, name: string, city: string, country?: string) => {
+export const createUserTimezone = async (
+	user_id: number,
+	name: string,
+	city: string,
+	country?: string
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -98,7 +112,7 @@ export const createTimezone = async (user_id: number, name: string, city: string
 	const formattedCity = city.toLowerCase().trim();
 
 	logger.debug(
-		'api/models/timezone/createTimezone',
+		'api/models/timezone/createUserTimezone',
 		'user_id:',
 		user_id,
 		'name:',
@@ -133,7 +147,11 @@ export const createTimezone = async (user_id: number, name: string, city: string
 	return userTimezone;
 };
 
-export const updateUserTimezone = async (user_id: number, name: string, data: Opts = { country: null }) => {
+export const updateUserTimezone = async (
+	user_id: number,
+	name: string,
+	data: Opts = { country: null }
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -223,7 +241,10 @@ export const updateUserTimezone = async (user_id: number, name: string, data: Op
 	return userTimezone;
 };
 
-export const deleteUserTimezone = async (user_id: number, name: string) => {
+export const deleteUserTimezone = async (
+	user_id: number,
+	name: string
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
