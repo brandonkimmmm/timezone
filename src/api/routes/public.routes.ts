@@ -4,7 +4,7 @@ import * as validator from '../middleware/validator';
 const router = express.Router();
 
 router.get('/info', publicControllers.getInfo);
-router.post('/signup', validator.signup, publicControllers.signup);
-router.post('/login', validator.login, publicControllers.login);
+router.post('/signup', validator.postSignup, publicControllers.postSignup);
+router.post('/login', validator.postLogin, publicControllers.postLogin);
 
 export default router;

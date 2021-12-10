@@ -1,8 +1,7 @@
 import logger from '../../utils/logger';
 import * as User from '../models/user';
 import { omit } from 'lodash';
-import { compare } from '../../utils/bcrypt';
-import { signToken} from '../../utils/jwt';
+import { signToken } from '../../utils/jwt';
 import { Request, Response } from 'express';
 
 export const getInfo = async (req: Request, res: Response) => {
@@ -12,22 +11,22 @@ export const getInfo = async (req: Request, res: Response) => {
 	});
 };
 
-export const signup = async (req: Request, res: Response) => {
+export const postSignup = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/public.controllers/signup',
+		'api/controllers/public.controllers/postSignup',
 		'email:',
 		email
 	);
 
 	try {
-		const user = await User.create(email, password);
+		const user = await User.createUser(email, password);
 
 		logger.verbose(
 			req.nanoid,
-			'api/controllers/public.controllers/signup',
+			'api/controllers/public.controllers/postSignup',
 			`User ${user.email} created`
 		);
 
@@ -37,7 +36,7 @@ export const signup = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/public.controllers/signup',
+			'api/controllers/public.controllers/postSignup',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -45,24 +44,24 @@ export const signup = async (req: Request, res: Response) => {
 	}
 };
 
-export const login = async (req: Request, res: Response) => {
+export const postLogin = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/public.controllers/login',
+		'api/controllers/public.controllers/postLogin',
 		'email:',
 		email
 	);
 
 	try {
-		const user = await User.getByEmail(email);
+		const user = await User.getUserByEmail(email);
 
 		if (!user) {
 			throw new Error('User not found');
 		}
 
-		const isValidPassword = await compare(password, user.password);
+		const isValidPassword = await user.verifyPassword(password);
 
 		if (!isValidPassword) {
 			throw new Error('Invalid password given');
@@ -70,7 +69,7 @@ export const login = async (req: Request, res: Response) => {
 
 		logger.verbose(
 			req.nanoid,
-			'api/controllers/public.controllers/login',
+			'api/controllers/public.controllers/postLogin',
 			'user logged in'
 		);
 
@@ -82,7 +81,7 @@ export const login = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/public.controllers/login',
+			'api/controllers/public.controllers/postLogin',
 			err instanceof Error ? err.message : ''
 		);
 

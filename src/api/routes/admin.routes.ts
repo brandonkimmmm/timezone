@@ -4,14 +4,19 @@ import * as authenticate from '../middleware/authenticate';
 import * as validator from '../middleware/validator';
 const router = express.Router();
 
-router.get('/admin/user/timezones', [ authenticate.validateJwtToken, validator.adminGetTimezones ], adminControllers.getTimezones);
-router.post('/admin/user/timezone', [ authenticate.validateJwtToken, validator.adminPostTimezone ], adminControllers.postTimezone);
-router.put('/admin/user/timezone', [ authenticate.validateJwtToken, validator.adminPutTimezone ], adminControllers.putTimezone);
-router.delete('/admin/user/timezone', [ authenticate.validateJwtToken, validator.adminDeleteTimezone ], adminControllers.deleteTimezone);
-router.put('/admin/user/role', [ authenticate.validateJwtToken, validator.adminPutUserRole ], adminControllers.putUserRole);
-router.get('/admin/user', [ authenticate.validateJwtToken, validator.adminGetUser ], adminControllers.getUser);
-router.delete('/admin/user', [ authenticate.validateJwtToken, validator.adminDeleteUser ], adminControllers.deleteUser);
-router.get('/admin/users', [ authenticate.validateJwtToken, validator.adminGetUsers ], adminControllers.getUsers);
-router.post('/admin/user', [ authenticate.validateJwtToken, validator.signup ], adminControllers.createUser);
+router.use(authenticate.validateJwtToken);
+router.put('/user/role', validator.putAdminUserRole, adminControllers.putAdminUserRole);
+router.get('/users', validator.getAdminUsers, adminControllers.getAdminUsers);
+router.get('/user/timezones', validator.getAdminTimezones, adminControllers.getAdminTimezones);
+
+router.route('/user')
+	.get(validator.getAdminUser, adminControllers.getAdminUser)
+	.post(validator.postSignup, adminControllers.postAdminUser)
+	.delete(validator.deleteAdminUser, adminControllers.deleteAdminUser);
+
+router.route('/user/timezone')
+	.post(validator.postAdminTimezone, adminControllers.postAdminTimezone)
+	.put(validator.putAdminTimezone, adminControllers.putAdminTimezone)
+	.delete(validator.deleteAdminTimezone, adminControllers.deleteAdminTimezone);
 
 export default router;

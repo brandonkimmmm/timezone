@@ -1,21 +1,27 @@
 import { sequelize } from '.';
-import { hash } from '../../utils/bcrypt';
 import {
 	Model,
 	Optional,
 	DataTypes,
 	HasManyGetAssociationsMixin,
 	HasManyCreateAssociationMixin,
-	HasManyHasAssociationMixin
+	HasManyHasAssociationMixin,
+	FindOptions
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
+import bcrypt from 'bcrypt';
+import { SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
 
-interface UserAttributes {
+export type Role = 'admin' | 'user';
+
+export interface UserAttributes {
 	id: number;
 	email: string;
 	password: string;
-	role: string;
+	role: Role
 }
+
+export type FindUserOpts = FindOptions<UserAttributes>
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
 
@@ -27,6 +33,11 @@ export interface UserInstance extends Model<UserAttributes, UserCreationAttribut
 		getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
 		createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
 		hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
+
+		verifyPassword: (password: string) => Promise<boolean>;
+		prototype: {
+			verifyPassword: (password: string) => Promise<boolean>;
+		}
 	}
 
 const User = sequelize.define<UserInstance>(
@@ -47,19 +58,24 @@ const User = sequelize.define<UserInstance>(
 			allowNull: false
 		},
 		role: {
-			type: DataTypes.STRING,
+			type: DataTypes.ENUM(...VALID_ROLES),
 			allowNull: false,
 			defaultValue: 'user'
 		}
 	}, {
-		tableName: 'Users'
+		tableName: 'Users',
+		hooks: {
+			beforeCreate: async (user: UserInstance) => {
+				const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+				user.password = hashedPassword;
+			}
+		}
 	}
 );
 
-User.beforeCreate(async (user: UserInstance) => {
-	const hashedPassword = await hash(user.password);
-	user.password = hashedPassword;
-});
+User.prototype.verifyPassword = function (password: string) {
+	return bcrypt.compare(password, this.password);
+};
 
 User.hasMany(Timezone, {
 	foreignKey: 'user_id',

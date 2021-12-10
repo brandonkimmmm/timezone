@@ -1,7 +1,10 @@
 import logger from '../../utils/logger';
 import { isInteger, isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../../utils/timezones';
-import { getById } from './user';
+import { getUserById } from './user';
+import { FindTimezoneOpts } from '../../db/models/timezone';
+import { TimezoneSchema } from '../../utils/schemas';
+import Joi from 'joi';
 
 interface Opts {
 	country?: string | null;
@@ -17,105 +20,101 @@ interface UpdateData {
 	timezone?: string;
 }
 
-export const getUserTimezones = async (user_id: number) => {
-	if (!isInteger(user_id) || user_id <= 0) {
-		throw new Error('Invalid user id given');
-	}
+export const getUserTimezones = async (
+	user_id: number,
+	opts: FindTimezoneOpts = {}
+) => {
+	const validatedUserId = await TimezoneSchema.extract('user_id').required().validateAsync(user_id);
 
 	logger.debug(
 		'api/models/timezone/getUserTimezones',
 		'user_id:',
-		user_id
+		validatedUserId
 	);
 
-	const user = await getById(user_id);
+	const user = await getUserById(validatedUserId);
 
 	// if user with given user_id is not found, throw an error
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	const timezones = await user.getTimezones();
+	const timezones = await user.getTimezones(opts);
 
 	return timezones;
 };
 
-export const getUserTimezone = async (user_id: number, name: string) => {
-	if (!isInteger(user_id) || user_id <= 0) {
-		throw new Error('Invalid user id given');
-	}
+export const getUserTimezone = async (
+	user_id: number,
+	name: string,
+	opts: FindTimezoneOpts = {}
+) => {
+	const validatedData = await Joi.object({
+		user_id: TimezoneSchema.extract('user_id').required(),
+		name: TimezoneSchema.extract('name').required()
+	}).validateAsync({ user_id, name });
 
-	if (!isString(name) || isEmpty(name)) {
-		throw new Error('Invalid name given');
-	}
-
-	const user = await getById(user_id);
+	const user = await getUserById(validatedData.user_id);
 
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	const formattedName = name.toLowerCase().trim();
-
 	logger.debug(
 		'api/models/timezone/getTimezone',
 		'user_id:',
-		user_id,
+		validatedData.user_id,
 		'name:',
-		formattedName
+		validatedData.name
 	);
 
 	const [ timezone ] = await user.getTimezones({
 		where: {
-			name: formattedName
-		}
+			name: validatedData.name
+		},
+		...opts
 	});
 
 	return timezone;
 };
 
-export const createTimezone = async (user_id: number, name: string, city: string, country?: string) => {
-	if (!isInteger(user_id) || user_id <= 0) {
-		throw new Error('Invalid user id given');
-	}
+export const createUserTimezone = async (
+	user_id: number,
+	name: string,
+	city: string,
+	country?: string
+) => {
+	const validatedData = await Joi.object({
+		user_id: TimezoneSchema.extract('user_id').required(),
+		name: TimezoneSchema.extract('name').required(),
+		city: TimezoneSchema.extract('city').required(),
+		country: TimezoneSchema.extract('country')
+	}).validateAsync({ user_id, name, city, country });
 
-	if (!isString(name) || isEmpty(name)) {
-		throw new Error('Invalid name given');
-	}
-
-	if (!isString(city) || isEmpty(city)) {
-		throw new Error('Invalid city given');
-	}
-
-	const user = await getById(user_id);
+	const user = await getUserById(validatedData.user_id);
 
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	// format name and city given (lower case, trim)
-	const formattedName = name.toLowerCase().trim();
-	const formattedCity = city.toLowerCase().trim();
-
 	logger.debug(
-		'api/models/timezone/createTimezone',
+		'api/models/timezone/createUserTimezone',
 		'user_id:',
-		user_id,
+		validatedData.user_id,
 		'name:',
-		formattedName,
+		validatedData.name,
 		'city:',
-		formattedCity
+		validatedData.city,
+		'country:',
+		validatedData.country
 	);
 
-	const {
-		timezone,
-		offset
-	} = await getCityTimezone(city, country);
+	const { timezone, offset } = await getCityTimezone(validatedData.city, validatedData.country);
 
 	const [ existingTimezone ] = await user.getTimezones({
 		where: {
-			name: formattedName,
-			city: formattedCity
+			name: validatedData.name,
+			city: validatedData.city
 		}
 	});
 
@@ -124,8 +123,8 @@ export const createTimezone = async (user_id: number, name: string, city: string
 	}
 
 	const userTimezone = await user.createTimezone({
-		name: formattedName,
-		city: formattedCity,
+		name: validatedData.name,
+		city: validatedData.city,
 		timezone,
 		offset
 	});
@@ -133,7 +132,11 @@ export const createTimezone = async (user_id: number, name: string, city: string
 	return userTimezone;
 };
 
-export const updateUserTimezone = async (user_id: number, name: string, data: Opts = { country: null }) => {
+export const updateUserTimezone = async (
+	user_id: number,
+	name: string,
+	data: Opts = { country: null }
+) => {
 	if (!isInteger(user_id) || user_id <= 0) {
 		throw new Error('Invalid user id given');
 	}
@@ -142,26 +145,31 @@ export const updateUserTimezone = async (user_id: number, name: string, data: Op
 		throw new Error('Invalid name given');
 	}
 
+	const validatedData = await Joi.object({
+		user_id: TimezoneSchema.extract('user_id').required(),
+		name: TimezoneSchema.extract('name').required(),
+		country: TimezoneSchema.extract('country')
+	}).validateAsync({ user_id, name, country: data.country });
+
 	logger.debug(
 		'api/models/timezone/updateUserTimezone',
 		'user_id:',
-		user_id,
+		validatedData.user_id,
 		'name:',
-		name
+		validatedData.name,
+		'country:',
+		validatedData.country
 	);
 
-	const user = await getById(user_id);
+	const user = await getUserById(validatedData.user_id);
 
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	// format name and city given (lower case, trim)
-	const formattedName = name.toLowerCase().trim();
-
 	const [ existingTimezone ] = await user.getTimezones({
 		where: {
-			name: formattedName
+			name: validatedData.name
 		}
 	});
 
@@ -170,7 +178,7 @@ export const updateUserTimezone = async (user_id: number, name: string, data: Op
 		throw new Error('Timezone not found');
 	}
 
-	const country = data.country;
+	const country = validatedData.country;
 
 	const givenData = omit(data, 'country');
 
@@ -223,35 +231,32 @@ export const updateUserTimezone = async (user_id: number, name: string, data: Op
 	return userTimezone;
 };
 
-export const deleteUserTimezone = async (user_id: number, name: string) => {
-	if (!isInteger(user_id) || user_id <= 0) {
-		throw new Error('Invalid user id given');
-	}
+export const deleteUserTimezone = async (
+	user_id: number,
+	name: string
+) => {
+	const validatedData = await Joi.object({
+		user_id: TimezoneSchema.extract('user_id').required(),
+		name: TimezoneSchema.extract('name').required(),
+	}).validateAsync({ user_id, name });
 
-	if (!isString(name) || isEmpty(name)) {
-		throw new Error('Invalid name given');
-	}
-
-	const user = await getById(user_id);
+	const user = await getUserById(validatedData.user_id);
 
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	// format name and city given (lower case, trim)
-	const formattedName = name.toLowerCase().trim();
-
 	logger.debug(
 		'api/models/timezone/deleteUserTimezone',
 		'user_id:',
-		user_id,
+		validatedData.user_id,
 		'name:',
-		formattedName
+		validatedData.name
 	);
 
 	const [ existingTimezone ] = await user.getTimezones({
 		where: {
-			name: formattedName
+			name: validatedData.name
 		}
 	});
 

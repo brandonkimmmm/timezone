@@ -1,7 +1,8 @@
 import cityTimezones from 'city-timezones';
-import { isString, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 import { TimezoneInstance } from '../db/models/timezone';
+import { TimezoneSchema } from './schemas';
 
 interface CityTimezone {
 	timezone: string;
@@ -17,9 +18,8 @@ interface Timezone {
 }
 
 export const getCityTimezone = async (city: string, country?: string): Promise<CityTimezone> => {
-	if (!isString(city) || isEmpty(city)) {
-		throw new Error('Invalid city');
-	}
+	city = await TimezoneSchema.extract('city').required().validateAsync(city);
+	country = await TimezoneSchema.extract('country').validateAsync(country);
 
 	const cityLookup = cityTimezones.lookupViaCity(city);
 
@@ -27,13 +27,9 @@ export const getCityTimezone = async (city: string, country?: string): Promise<C
 		throw new Error('Invalid city');
 	}
 
-	let foundCity;
-
-	if (isString(country) && country.length === 2) {
-		foundCity = cityLookup.find((city) => city.iso2 === country.toUpperCase());
-	} else {
-		foundCity = cityLookup[0];
-	}
+	const foundCity = country
+		? cityLookup.find((city) => city.iso2 === country)
+		: cityLookup[0];
 
 	if (!foundCity) {
 		throw new Error('Invalid city');
