@@ -5,6 +5,9 @@
 		"outDir": "build",
 		"declaration": true
 	},
+	"include": [
+		"src/**/*"
+	],
 	"exclude": [
 		"tests/**/*.ts"
 	]

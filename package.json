@@ -5,7 +5,7 @@
 	"main": "src/app.js",
 	"scripts": {
 		"start": "node build/app.js",
-		"build": "tsc --project tsconfig.build.json",
+		"build": "rimraf build && tsc --project tsconfig.build.json",
 		"dev": "nodemon src/app.ts",
 		"test": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test mocha -r ts-node/register tests/**/*.ts --reporter spec --timeout 5000 --exit"
 	},
@@ -53,6 +53,7 @@
 		"faker": "^5.5.3",
 		"mocha": "^9.1.2",
 		"nodemon": "^2.0.13",
+		"rimraf": "^3.0.2",
 		"sequelize-cli": "^6.2.0",
 		"ts-node": "^10.4.0",
 		"typescript": "^4.5.2"
