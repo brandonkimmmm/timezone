@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../../src/app';
-import { create } from '../../src/api/models/user';
+import { createUser } from '../../src/api/models/user';
 import { signToken } from '../../src/utils/jwt';
 import { truncate } from '../utils/db';
 import { getMockUser } from '../utils/mock';
@@ -24,12 +24,12 @@ describe('Admin endpoints', () => {
 
 	before(async () => {
 		await truncate();
-		const admin = await create(USERS.admin.email, USERS.admin.password, 'admin');
+		const admin = await createUser(USERS.admin.email, USERS.admin.password, 'admin');
 		USERS.admin.id = admin.id;
 		const adminToken = await signToken(USERS.admin.id, USERS.admin.email, USERS.admin.role);
 		USERS.admin.token = adminToken;
 
-		const user = await create(USERS.user.email, USERS.user.password);
+		const user = await createUser(USERS.user.email, USERS.user.password);
 		USERS.user.id = user.id;
 		const token = await signToken(USERS.user.id, USERS.user.email, USERS.user.role);
 		USERS.user.token = token;

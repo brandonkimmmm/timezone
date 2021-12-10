@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import { create } from '../../src/api/models/user';
+import { createUser } from '../../src/api/models/user';
 import { truncate } from '../utils/db';
 import {
 	createTimezone,
@@ -22,7 +22,7 @@ const TIMEZONE = {
 describe('Timezone model', () => {
 	before(async () => {
 		await truncate();
-		const user = await create(USER.email, USER.password);
+		const user = await createUser(USER.email, USER.password);
 		USER.id = user.id;
 	});
 

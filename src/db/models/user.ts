@@ -5,7 +5,8 @@ import {
 	DataTypes,
 	HasManyGetAssociationsMixin,
 	HasManyCreateAssociationMixin,
-	HasManyHasAssociationMixin
+	HasManyHasAssociationMixin,
+	FindOptions
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
@@ -13,12 +14,14 @@ import { SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
 
 export type Role = 'admin' | 'user';
 
-interface UserAttributes {
+export interface UserAttributes {
 	id: number;
 	email: string;
 	password: string;
 	role: Role
 }
+
+export type FindUserOpts = FindOptions<UserAttributes>
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
 

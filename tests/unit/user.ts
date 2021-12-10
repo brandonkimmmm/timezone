@@ -2,12 +2,12 @@ import chai, { expect } from 'chai';
 import { truncate } from '../utils/db';
 import { createTimezone } from '../../src/api/models/timezone';
 import {
-	create,
-	getByEmail,
-	getById,
-	updateRole,
+	createUser,
+	getUserByEmail,
+	getUserById,
+	updateUserRole,
 	deleteUser,
-	getAll
+	getUsers
 } from '../../src/api/models/user';
 import Timezone from '../../src/db/models/timezone';
 import { getMockUser } from '../utils/mock';
@@ -19,7 +19,7 @@ const TIMEZONE = {
 	name: 'my city new york'
 };
 
-describe('User model', () => {
+describe('User Helper Functions', () => {
 
 	before(async () => {
 		await truncate();
@@ -29,9 +29,9 @@ describe('User model', () => {
 		await truncate();
 	});
 
-	describe('User create', () => {
+	describe('#createUser', () => {
 		it('it should return created user', async () => {
-			const currentUser = await create(USER.email, USER.password);
+			const currentUser = await createUser(USER.email, USER.password);
 
 			currentUser.should.be.an('object');
 			currentUser.should.have.property('dataValues');
@@ -48,7 +48,7 @@ describe('User model', () => {
 
 		it('it should throw an error if invalid email given', async () => {
 			try {
-				await create('nope', USER.password);
+				await createUser('nope', USER.password);
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Invalid email given');
@@ -57,7 +57,7 @@ describe('User model', () => {
 
 		it('it should throw an error if user exists', async () => {
 			try {
-				await create(USER.email, USER.password);
+				await createUser(USER.email, USER.password);
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql(`User ${USER.email} already exists`);
@@ -66,7 +66,7 @@ describe('User model', () => {
 
 		it('it should throw an error if invalid password', async () => {
 			try {
-				await create(getMockUser().email, 'nope');
+				await createUser(getMockUser().email, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Invalid password given');
@@ -74,9 +74,9 @@ describe('User model', () => {
 		});
 	});
 
-	describe('User get all', () => {
+	describe('#getUsers', () => {
 		it('it should get all user data', async () => {
-			const users = await getAll();
+			const users = await getUsers();
 
 			users.should.be.an('array');
 			users.should.have.length(1);
@@ -92,14 +92,14 @@ describe('User model', () => {
 		});
 
 		it('it should get all user data with role admin', async () => {
-			const users = await getAll({ where: { role: 'admin' }, order: [['id', 'asc']]});
+			const users = await getUsers({ where: { role: 'admin' }, order: [['id', 'asc']]});
 
 			users.should.be.an('array');
 			users.should.have.length(0);
 		});
 
 		it('it should get all user data with role user', async () => {
-			const users = await getAll({ where: { role: 'user' }, order: [['id', 'asc']]});
+			const users = await getUsers({ where: { role: 'user' }, order: [['id', 'asc']]});
 
 			users.should.be.an('array');
 			users.should.have.length(1);
@@ -117,9 +117,9 @@ describe('User model', () => {
 		});
 	});
 
-	describe('User get By Email', () => {
+	describe('#getUserByEmail', () => {
 		it('it should get user data if user exists', async () => {
-			const currentUser = await getByEmail(USER.email);
+			const currentUser = await getUserByEmail(USER.email);
 
 			currentUser?.should.be.an('object');
 			// currentUser.should.have.property('dataValues');
@@ -134,14 +134,14 @@ describe('User model', () => {
 		});
 
 		it('it should return null if user does not exist', async () => {
-			const currentUser = await getByEmail(getMockUser().email);
+			const currentUser = await getUserByEmail(getMockUser().email);
 			should.not.exist(currentUser);
 		});
 	});
 
-	describe('User get By ID', () => {
+	describe('#getUserById', () => {
 		it('it should get user data if user exists', async () => {
-			const currentUser = await getById(USER.id);
+			const currentUser = await getUserById(USER.id);
 
 			currentUser?.should.be.an('object');
 			// currentUser.should.have.property('dataValues');
@@ -157,14 +157,14 @@ describe('User model', () => {
 		});
 
 		it('it should return null if user does not exist', async () => {
-			const currentUser = await getById(99999999999999);
+			const currentUser = await getUserById(99999999999999);
 			should.not.exist(currentUser);
 		});
 	});
 
-	describe('User update role', () => {
+	describe('#updateUserRole', () => {
 		it('it should update user role to admin if user exists', async () => {
-			const user = await updateRole(USER.id, 'admin');
+			const user = await updateUserRole(USER.id, 'admin');
 
 			user.should.be.an('object');
 			// user.should.have.property('dataValues');
@@ -181,7 +181,7 @@ describe('User model', () => {
 		});
 
 		it('it should update user role to user if user exists', async () => {
-			const user = await updateRole(USER.id, 'user');
+			const user = await updateUserRole(USER.id, 'user');
 
 			user.should.be.an('object');
 			// user.should.have.property('dataValues');
@@ -200,7 +200,7 @@ describe('User model', () => {
 		it('it should throw an error if invalid role is given', async () => {
 			try {
 				// @ts-expect-error: Testing invalid role passed
-				await updateRole(USER.id, 'nope');
+				await updateUserRole(USER.id, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Invalid role given');
@@ -209,7 +209,7 @@ describe('User model', () => {
 
 		it('it should throw an error if role is the same', async () => {
 			try {
-				await updateRole(USER.id, 'user');
+				await updateUserRole(USER.id, 'user');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('User already has role user');
@@ -218,7 +218,7 @@ describe('User model', () => {
 
 		it('it should throw an error if user not found', async () => {
 			try {
-				await updateRole(999999, 'user');
+				await updateUserRole(999999, 'user');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
@@ -227,7 +227,7 @@ describe('User model', () => {
 
 		it('it should throw an error if user id 1 is given', async () => {
 			try {
-				await updateRole(1, 'user');
+				await updateUserRole(1, 'user');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
 				expect(err instanceof Error ? err.message : '').to.eql('Cannot update master admin role');
@@ -235,11 +235,11 @@ describe('User model', () => {
 		});
 	});
 
-	describe('User delete', () => {
+	describe('#deleteUser', () => {
 		it('it should delete user and timezones for user', async () => {
 			await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
 
-			const user = await getById(USER.id);
+			const user = await getUserById(USER.id);
 			const timezones = await user?.getTimezones();
 
 			timezones?.should.have.lengthOf(1);
@@ -259,7 +259,7 @@ describe('User model', () => {
 
 			await user?.destroy();
 
-			const deletedUser = await getById(USER.id);
+			const deletedUser = await getUserById(USER.id);
 			should.not.exist(deletedUser);
 
 			const userTimezones = await Timezone.findOne({ where: { name: TIMEZONE.name }, raw: true });

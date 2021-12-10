@@ -1,7 +1,7 @@
 import logger from '../../utils/logger';
 import { isInteger, isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../../utils/timezones';
-import { getById } from './user';
+import { getUserById } from './user';
 
 interface Opts {
 	country?: string | null;
@@ -28,7 +28,7 @@ export const getUserTimezones = async (user_id: number) => {
 		user_id
 	);
 
-	const user = await getById(user_id);
+	const user = await getUserById(user_id);
 
 	// if user with given user_id is not found, throw an error
 	if (!user) {
@@ -49,7 +49,7 @@ export const getUserTimezone = async (user_id: number, name: string) => {
 		throw new Error('Invalid name given');
 	}
 
-	const user = await getById(user_id);
+	const user = await getUserById(user_id);
 
 	if (!user) {
 		throw new Error('User not found');
@@ -87,7 +87,7 @@ export const createTimezone = async (user_id: number, name: string, city: string
 		throw new Error('Invalid city given');
 	}
 
-	const user = await getById(user_id);
+	const user = await getUserById(user_id);
 
 	if (!user) {
 		throw new Error('User not found');
@@ -150,7 +150,7 @@ export const updateUserTimezone = async (user_id: number, name: string, data: Op
 		name
 	);
 
-	const user = await getById(user_id);
+	const user = await getUserById(user_id);
 
 	if (!user) {
 		throw new Error('User not found');
@@ -232,7 +232,7 @@ export const deleteUserTimezone = async (user_id: number, name: string) => {
 		throw new Error('Invalid name given');
 	}
 
-	const user = await getById(user_id);
+	const user = await getUserById(user_id);
 
 	if (!user) {
 		throw new Error('User not found');

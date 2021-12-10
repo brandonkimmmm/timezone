@@ -1,26 +1,32 @@
-import User, { Role } from '../../db/models/user';
+import User, { Role, FindUserOpts } from '../../db/models/user';
 import logger from '../../utils/logger';
 import { isString, isInteger, isEmpty } from 'lodash';
 import validator from 'validator';
 import { PASSWORD_REGEX, VALID_ROLES } from '../../config/constants';
 
-export const getById = async (id: number) => {
+export const getUserById = async (
+	id: number,
+	opts: FindUserOpts = {}
+) => {
 	if (!isInteger(id) || id <= 0) {
 		throw new Error('Invalid ID');
 	}
 
 	logger.debug(
-		'api/models/user/getById',
+		'api/models/user/getUserById',
 		'id:',
 		id
 	);
 
-	const user = await User.findByPk(id);
+	const user = await User.findByPk(id, opts);
 
 	return user;
 };
 
-export const getByEmail = async (email: string) => {
+export const getUserByEmail = async (
+	email: string,
+	opts: FindUserOpts = {}
+) => {
 	if (!isString(email) || !validator.isEmail(email)) {
 		throw new Error('Invalid email given');
 	}
@@ -28,7 +34,7 @@ export const getByEmail = async (email: string) => {
 	const formattedEmail = email.toLowerCase().trim();
 
 	logger.debug(
-		'api/models/user/getByEmail',
+		'api/models/user/getUserByEmail',
 		'email:',
 		email,
 		'formattedEmail:',
@@ -38,15 +44,18 @@ export const getByEmail = async (email: string) => {
 	const user = await User.findOne({
 		where: {
 			email: formattedEmail
-		}
+		},
+		...opts
 	});
 
 	return user;
 };
 
-export const getAll = async (opts = {}) => {
+export const getUsers = async (
+	opts: FindUserOpts = {}
+) => {
 	logger.debug(
-		'api/models/user/getAll'
+		'api/models/user/getUsers'
 	);
 
 	const users = await User.findAll(opts);
@@ -54,7 +63,7 @@ export const getAll = async (opts = {}) => {
 	return users;
 };
 
-export const create = async (
+export const createUser = async (
 	email: string,
 	password: string,
 	role: Role = 'user'
@@ -70,7 +79,7 @@ export const create = async (
 	const formattedEmail = email.toLowerCase().trim();
 
 	logger.debug(
-		'api/models/user/create asdfasd',
+		'api/models/user/createUser',
 		'email:',
 		email,
 		'formattedEamil:',
@@ -79,7 +88,7 @@ export const create = async (
 		role
 	);
 
-	const existingUser = await getByEmail(formattedEmail);
+	const existingUser = await getUserByEmail(formattedEmail);
 
 	if (existingUser) {
 		throw new Error(`User ${email} already exists`);
@@ -94,7 +103,7 @@ export const create = async (
 	return user;
 };
 
-export const updateRole = async (
+export const updateUserRole = async (
 	id: number,
 	role: Role = 'user'
 ) => {
@@ -122,7 +131,7 @@ export const updateRole = async (
 		role
 	);
 
-	const user = await getById(id);
+	const user = await getUserById(id);
 
 	if (!user) {
 		throw new Error('User not found');
@@ -154,7 +163,7 @@ export const deleteUser = async (id: number) => {
 		id
 	);
 
-	const user = await getById(id);
+	const user = await getUserById(id);
 
 	if (!user) {
 		throw new Error('User not found');

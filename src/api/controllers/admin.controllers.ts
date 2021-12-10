@@ -4,6 +4,7 @@ import * as User from '../models/user';
 import { formatTimezones } from '../../utils/timezones';
 import { omit } from 'lodash';
 import { Request, Response } from 'express';
+import { FindUserOpts } from '../../db/models/user';
 
 export const getTimezones = async (req: Request, res: Response) => {
 	const { user_id } = req.query as any;
@@ -156,7 +157,7 @@ export const putUserRole = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.updateRole(user_id, role);
+		const user = await User.updateUserRole(user_id, role);
 
 		return res.status(200).json(omit(user.toJSON(), ['password']));
 	} catch (err) {
@@ -181,7 +182,7 @@ export const getUser = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.getById(user_id);
+		const user = await User.getUserById(user_id);
 
 		if (!user) {
 			throw new Error('User not found');
@@ -236,7 +237,7 @@ export const getUsers = async (req: Request, res: Response) => {
 		role
 	);
 
-	const options = {
+	const options: FindUserOpts = {
 		raw: true,
 		attributes: {
 			exclude: ['password']
@@ -250,7 +251,7 @@ export const getUsers = async (req: Request, res: Response) => {
 	}
 
 	try {
-		const users = await User.getAll(options);
+		const users = await User.getUsers(options);
 
 		return res.json(users);
 	} catch (err) {
@@ -275,7 +276,7 @@ export const createUser = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.create(email, password);
+		const user = await User.createUser(email, password);
 
 		logger.verbose(
 			req.nanoid,

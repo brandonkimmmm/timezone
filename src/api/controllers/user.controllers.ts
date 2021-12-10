@@ -16,7 +16,7 @@ export const get = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.getByEmail(email);
+		const user = await User.getUserByEmail(email);
 
 		if (!user) {
 			throw new Error('User not found');
