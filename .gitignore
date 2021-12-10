@@ -2,3 +2,4 @@
 /logs
 build
 .env
+yarn-error.log
