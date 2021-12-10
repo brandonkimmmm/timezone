@@ -1,5 +1,6 @@
 import { PORT } from './config/constants';
 import logger from './utils/logger';
+import morgan from 'morgan';
 import express from 'express';
 import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
@@ -10,6 +11,13 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(
+	morgan(
+		'tiny',
+		{ stream: { write: (message) => logger.info(message) } }
+	)
+);
 
 app.use(async (req, res, next) => {
 	req.nanoid = nanoid();
