@@ -6,13 +6,13 @@ const router = express.Router();
 
 router.use(authenticate.validateJwtToken);
 
-router.get('/', userControllers.get);
+router.get('/', userControllers.getUser);
 
 router.route('/timezone')
-	.post(validator.postUserTimezone, userControllers.postTimezone)
-	.put(validator.putUserTimezone, userControllers.putTimezone)
-	.delete(validator.deleteUserTimezone, userControllers.deleteTimezone);
+	.post(validator.postUserTimezone, userControllers.postUserTimezone)
+	.put(validator.putUserTimezone, userControllers.putUserTimezone)
+	.delete(validator.deleteUserTimezone, userControllers.deleteUserTimezone);
 
-router.get('/timezones', userControllers.getTimezones);
+router.get('/timezones', userControllers.getUserTimezones);
 
 export default router;

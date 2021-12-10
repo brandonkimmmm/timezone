@@ -11,12 +11,12 @@ export const getInfo = async (req: Request, res: Response) => {
 	});
 };
 
-export const signup = async (req: Request, res: Response) => {
+export const postSignup = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/public.controllers/signup',
+		'api/controllers/public.controllers/postSignup',
 		'email:',
 		email
 	);
@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
 
 		logger.verbose(
 			req.nanoid,
-			'api/controllers/public.controllers/signup',
+			'api/controllers/public.controllers/postSignup',
 			`User ${user.email} created`
 		);
 
@@ -36,7 +36,7 @@ export const signup = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/public.controllers/signup',
+			'api/controllers/public.controllers/postSignup',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -44,12 +44,12 @@ export const signup = async (req: Request, res: Response) => {
 	}
 };
 
-export const login = async (req: Request, res: Response) => {
+export const postLogin = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/public.controllers/login',
+		'api/controllers/public.controllers/postLogin',
 		'email:',
 		email
 	);
@@ -69,7 +69,7 @@ export const login = async (req: Request, res: Response) => {
 
 		logger.verbose(
 			req.nanoid,
-			'api/controllers/public.controllers/login',
+			'api/controllers/public.controllers/postLogin',
 			'user logged in'
 		);
 
@@ -81,7 +81,7 @@ export const login = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/public.controllers/login',
+			'api/controllers/public.controllers/postLogin',
 			err instanceof Error ? err.message : ''
 		);
 

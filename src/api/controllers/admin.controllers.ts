@@ -6,12 +6,12 @@ import { omit } from 'lodash';
 import { Request, Response } from 'express';
 import { FindUserOpts } from '../../db/models/user';
 
-export const getTimezones = async (req: Request, res: Response) => {
+export const getAdminTimezones = async (req: Request, res: Response) => {
 	const { user_id } = req.query as any;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/getTimezones',
+		'api/controllers/admin.controllers/getAdminTimezones',
 		'user_id:',
 		user_id
 	);
@@ -24,7 +24,7 @@ export const getTimezones = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/getTimezones',
+			'api/controllers/admin.controllers/getAdminTimezones',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -32,7 +32,7 @@ export const getTimezones = async (req: Request, res: Response) => {
 	}
 };
 
-export const postTimezone = async (req: Request, res: Response) => {
+export const postAdminTimezone = async (req: Request, res: Response) => {
 	const {
 		user_id,
 		name,
@@ -42,7 +42,7 @@ export const postTimezone = async (req: Request, res: Response) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/postTimezone',
+		'api/controllers/admin.controllers/postAdminTimezone',
 		'user_id:',
 		user_id,
 		'name:',
@@ -60,7 +60,7 @@ export const postTimezone = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/postTimezone',
+			'api/controllers/admin.controllers/postAdminTimezone',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -68,7 +68,7 @@ export const postTimezone = async (req: Request, res: Response) => {
 	}
 };
 
-export const putTimezone = async (req: Request, res: Response) => {
+export const putAdminTimezone = async (req: Request, res: Response) => {
 	const {
 		user_id,
 		updated_name,
@@ -79,7 +79,7 @@ export const putTimezone = async (req: Request, res: Response) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/putTimezone',
+		'api/controllers/admin.controllers/putAdminTimezone',
 		'user_id:',
 		user_id,
 		'name:',
@@ -103,7 +103,7 @@ export const putTimezone = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/putTimezone',
+			'api/controllers/admin.controllers/putAdminTimezone',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -111,7 +111,7 @@ export const putTimezone = async (req: Request, res: Response) => {
 	}
 };
 
-export const deleteTimezone = async (req: Request, res: Response) => {
+export const deleteAdminTimezone = async (req: Request, res: Response) => {
 	const {
 		user_id,
 		name
@@ -119,7 +119,7 @@ export const deleteTimezone = async (req: Request, res: Response) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/deleteTimezone',
+		'api/controllers/admin.controllers/deleteAdminTimezone',
 		'user_id:',
 		user_id,
 		'name:',
@@ -133,7 +133,7 @@ export const deleteTimezone = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/deleteTimezone',
+			'api/controllers/admin.controllers/deleteAdminTimezone',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -141,7 +141,7 @@ export const deleteTimezone = async (req: Request, res: Response) => {
 	}
 };
 
-export const putUserRole = async (req: Request, res: Response) => {
+export const putAdminUserRole = async (req: Request, res: Response) => {
 	const {
 		user_id,
 		role
@@ -149,7 +149,7 @@ export const putUserRole = async (req: Request, res: Response) => {
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/putUserRole',
+		'api/controllers/admin.controllers/putAdminUserRole',
 		'user_id:',
 		user_id,
 		'role:',
@@ -163,7 +163,7 @@ export const putUserRole = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/putUserRole',
+			'api/controllers/admin.controllers/putAdminUserRole',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -171,12 +171,12 @@ export const putUserRole = async (req: Request, res: Response) => {
 	}
 };
 
-export const getUser = async (req: Request, res: Response) => {
+export const getAdminUser = async (req: Request, res: Response) => {
 	const { user_id } = req.query as any;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/getUser',
+		'api/controllers/admin.controllers/getAdminUser',
 		'user_id:',
 		user_id
 	);
@@ -195,7 +195,7 @@ export const getUser = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/getUser',
+			'api/controllers/admin.controllers/getAdminUser',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -203,14 +203,14 @@ export const getUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteAdminUser = async (req: Request, res: Response) => {
 	const {
 		user_id
 	} = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/deleteUser',
+		'api/controllers/admin.controllers/deleteAdminUser',
 		'user_id:',
 		user_id
 	);
@@ -222,7 +222,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/deleteUser',
+			'api/controllers/admin.controllers/deleteAdminUser',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -230,12 +230,12 @@ export const deleteUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getAdminUsers = async (req: Request, res: Response) => {
 	const { role } = req.query;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/getUsers',
+		'api/controllers/admin.controllers/getAdminUsers',
 		'role:',
 		role
 	);
@@ -260,7 +260,7 @@ export const getUsers = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/getUsers',
+			'api/controllers/admin.controllers/getAdminUsers',
 			err instanceof Error ? err.message : ''
 		);
 
@@ -268,12 +268,12 @@ export const getUsers = async (req: Request, res: Response) => {
 	}
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const postAdminUser = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
 	logger.info(
 		req.nanoid,
-		'api/controllers/admin.controllers/createUser',
+		'api/controllers/admin.controllers/postAdminUser',
 		'email:',
 		email
 	);
@@ -283,7 +283,7 @@ export const createUser = async (req: Request, res: Response) => {
 
 		logger.verbose(
 			req.nanoid,
-			'api/controllers/admin.controllers/createUser',
+			'api/controllers/admin.controllers/postAdminUser',
 			`User ${user.email} created`
 		);
 
@@ -293,7 +293,7 @@ export const createUser = async (req: Request, res: Response) => {
 	} catch (err) {
 		logger.error(
 			req.nanoid,
-			'api/controllers/admin.controllers/createUser',
+			'api/controllers/admin.controllers/postAdminUser',
 			err instanceof Error ? err.message : ''
 		);
 
