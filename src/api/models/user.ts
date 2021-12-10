@@ -1,24 +1,21 @@
+import Joi from 'joi';
 import User, { Role, FindUserOpts } from '../../db/models/user';
 import logger from '../../utils/logger';
-import { isString, isInteger, isEmpty } from 'lodash';
-import validator from 'validator';
-import { PASSWORD_REGEX, VALID_ROLES } from '../../config/constants';
+import { UserSchema } from '../../utils/schemas';
 
 export const getUserById = async (
 	id: number,
 	opts: FindUserOpts = {}
 ) => {
-	if (!isInteger(id) || id <= 0) {
-		throw new Error('Invalid ID');
-	}
+	const validatedId = await UserSchema.extract('id').required().validateAsync(id);
 
 	logger.debug(
 		'api/models/user/getUserById',
 		'id:',
-		id
+		validatedId
 	);
 
-	const user = await User.findByPk(id, opts);
+	const user = await User.findByPk(validatedId, opts);
 
 	return user;
 };
@@ -27,24 +24,16 @@ export const getUserByEmail = async (
 	email: string,
 	opts: FindUserOpts = {}
 ) => {
-	if (!isString(email) || !validator.isEmail(email)) {
-		throw new Error('Invalid email given');
-	}
-
-	const formattedEmail = email.toLowerCase().trim();
+	const validatedEmail = await UserSchema.extract('email').required().validateAsync(email);
 
 	logger.debug(
 		'api/models/user/getUserByEmail',
 		'email:',
-		email,
-		'formattedEmail:',
-		formattedEmail
+		validatedEmail
 	);
 
 	const user = await User.findOne({
-		where: {
-			email: formattedEmail
-		},
+		where: { email: validatedEmail },
 		...opts
 	});
 
@@ -68,36 +57,30 @@ export const createUser = async (
 	password: string,
 	role: Role = 'user'
 ) => {
-	if (!isString(email) || !validator.isEmail(email)) {
-		throw new Error('Invalid email given');
-	}
-
-	if (!isString(password) || !PASSWORD_REGEX.test(password)) {
-		throw new Error('Invalid password given');
-	}
-
-	const formattedEmail = email.toLowerCase().trim();
+	const validatedData = await Joi.object({
+		email: UserSchema.extract('email').required(),
+		password: UserSchema.extract('password').required(),
+		role: UserSchema.extract('role').default('user')
+	}).validateAsync({ email, password, role });
 
 	logger.debug(
 		'api/models/user/createUser',
 		'email:',
-		email,
-		'formattedEamil:',
-		formattedEmail,
+		validatedData.email,
 		'role:',
-		role
+		validatedData.role
 	);
 
-	const existingUser = await getUserByEmail(formattedEmail);
+	const existingUser = await getUserByEmail(validatedData.email);
 
 	if (existingUser) {
-		throw new Error(`User ${email} already exists`);
+		throw new Error(`User ${validatedData.email} already exists`);
 	}
 
 	const user = await User.create({
-		email: formattedEmail,
-		password,
-		role: role ||= 'user'
+		email: validatedData.email,
+		password: validatedData.password,
+		role: validatedData.role
 	});
 
 	return user;
@@ -105,65 +88,56 @@ export const createUser = async (
 
 export const updateUserRole = async (
 	id: number,
-	role: Role = 'user'
+	role: Role
 ) => {
-	if (!isInteger(id) || id <= 0) {
-		throw new Error('Invalid id given');
-	}
+	const validatedData = await Joi.object({
+		id: UserSchema.extract('id').required(),
+		role: UserSchema.extract('role').required()
+	}).validateAsync({ id, role });
 
-	if (id === 1) {
+	if (validatedData.id === 1) {
 		throw new Error('Cannot update master admin role');
-	}
-
-	if (!isString(role) || isEmpty(role)) {
-		throw new Error('Invalid role given');
-	}
-
-	if (!VALID_ROLES.includes(role)) {
-		throw new Error('Invalid role given');
 	}
 
 	logger.debug(
 		'api/models/user/updateUserRole',
 		'id:',
-		id,
+		validatedData.id,
 		'role:',
-		role
+		validatedData.role
 	);
 
-	const user = await getUserById(id);
+	const user = await getUserById(validatedData.id);
 
 	if (!user) {
 		throw new Error('User not found');
 	}
 
-	if (user.role === role) {
-		throw new Error(`User already has role ${role}`);
+	if (user.role === validatedData.role) {
+		throw new Error(`User already has role ${validatedData.role}`);
 	}
 
 	await user.update({
-		role
+		role: validatedData.role
 	}, { fields: ['role'] });
 
 	return user;
 };
 
 export const deleteUser = async (id: number) => {
-	if (!isInteger(id) || id <= 0) {
-		throw new Error('Invalid id given');
-	}
+	const validatedId = await UserSchema.extract('id').required().validateAsync(id);
 
-	if (id === 1) {
+	if (validatedId === 1) {
 		throw new Error('Cannot delete master admin');
 	}
 
 	logger.debug(
 		'api/models/user/deleteUser',
 		'id:',
-		id
+		validatedId
 	);
 
-	const user = await getUserById(id);
+	const user = await getUserById(validatedId);
 
 	if (!user) {
 		throw new Error('User not found');

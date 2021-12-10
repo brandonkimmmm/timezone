@@ -48,7 +48,7 @@ export const postUserTimezone = async (req: Request, res: Response, next: NextFu
 };
 
 const PostAdminTimezoneSchema = PostUserTimezoneSchema.keys({
-	user_id: UserSchema.extract('id').required()
+	user_id: TimezoneSchema.extract('user_id').required()
 });
 
 export const postAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
@@ -77,7 +77,7 @@ export const putUserTimezone = async (req: Request, res: Response, next: NextFun
 };
 
 const PutAdminTimezoneSchema = PutUserTimezoneSchema.keys({
-	user_id: UserSchema.extract('id').required()
+	user_id: TimezoneSchema.extract('user_id').required()
 });
 
 export const putAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
@@ -103,7 +103,7 @@ export const deleteUserTimezone = async (req: Request, res: Response, next: Next
 };
 
 const DeleteAdminTimezoneSchema = DeleteUserTimezoneSchema.keys({
-	user_id: UserSchema.extract('id').required()
+	user_id: TimezoneSchema.extract('user_id').required()
 });
 
 export const deleteAdminTimezone = async (req: Request, res: Response, next: NextFunction) => {
@@ -116,7 +116,7 @@ export const deleteAdminTimezone = async (req: Request, res: Response, next: Nex
 };
 
 const GetAdminTimezonesSchema = Joi.object({
-	user_id: UserSchema.extract('id').required()
+	user_id: TimezoneSchema.extract('user_id').required()
 });
 
 export const getAdminTimezones = async (req: Request, res: Response, next: NextFunction) => {
@@ -129,7 +129,7 @@ export const getAdminTimezones = async (req: Request, res: Response, next: NextF
 };
 
 const PutAdminUserRoleSchema = Joi.object({
-	user_id: UserSchema.extract('id').required(),
+	user_id: TimezoneSchema.extract('user_id').required(),
 	role: UserSchema.extract('role').required()
 });
 
@@ -143,7 +143,7 @@ export const putAdminUserRole = async (req: Request, res: Response, next: NextFu
 };
 
 const GetAdminUserSchema = Joi.object({
-	user_id: UserSchema.extract('id').required()
+	user_id: TimezoneSchema.extract('user_id').required()
 });
 
 export const getAdminUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -169,7 +169,7 @@ export const getAdminUsers = async (req: Request, res: Response, next: NextFunct
 };
 
 const DeleteAdminUserSchema = Joi.object({
-	user_id: UserSchema.extract('id').required()
+	user_id: UserSchema.extract('id').label('user_id').required()
 });
 
 export const deleteAdminUser = async (req: Request, res: Response, next: NextFunction) => {

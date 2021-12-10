@@ -51,7 +51,7 @@ describe('User Helper Functions', () => {
 				await createUser('nope', USER.password);
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
-				expect(err instanceof Error ? err.message : '').to.eql('Invalid email given');
+				expect(err instanceof Error ? err.message : '').to.eql('"email" must be a valid email');
 			}
 		});
 
@@ -69,7 +69,7 @@ describe('User Helper Functions', () => {
 				await createUser(getMockUser().email, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
-				expect(err instanceof Error ? err.message : '').to.eql('Invalid password given');
+				expect(err instanceof Error ? err.message : '').to.eql('"password" with value "nope" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/');
 			}
 		});
 	});
@@ -203,7 +203,7 @@ describe('User Helper Functions', () => {
 				await updateUserRole(USER.id, 'nope');
 				expect(true, 'promise should fail').eq(false);
 			} catch (err) {
-				expect(err instanceof Error ? err.message : '').to.eql('Invalid role given');
+				expect(err instanceof Error ? err.message : '').to.eql('"role" must be one of [admin, user]');
 			}
 		});
 
