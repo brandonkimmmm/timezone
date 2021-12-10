@@ -1,8 +1,11 @@
 import { Sequelize } from 'sequelize';
 import { NODE_ENV } from '../../config/constants';
-import getDbConfig from '../../config/db';
+import DbConfig from '../../config/db';
+import logger from '../../utils/logger';
 
-const dbConfig = getDbConfig(NODE_ENV);
-const sequelize = new Sequelize(dbConfig);
+const sequelize = new Sequelize({
+	...DbConfig[NODE_ENV],
+	logging: NODE_ENV === 'test' ? false : (msg) => logger.debug(msg)
+});
 
 export { Sequelize, sequelize };

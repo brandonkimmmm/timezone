@@ -10,6 +10,7 @@
 			"dom"
 		],
 		"strict": true,
+		"allowJs": true,
 		"strictPropertyInitialization": false,
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
