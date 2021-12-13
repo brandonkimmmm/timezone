@@ -34,11 +34,19 @@ const Timezone = sequelize.define<TimezoneInstance>(
 		},
 		name: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				isLowercase: true,
+				notEmpty: true
+			}
 		},
 		city: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: false,
+			validate: {
+				isLowercase: true,
+				notEmpty: true
+			}
 		},
 		timezone: {
 			type: DataTypes.STRING,

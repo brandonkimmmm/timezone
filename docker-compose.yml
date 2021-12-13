@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  server:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+  database:
+    image: postgres:14.1
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
+    depends_on:
+      - server

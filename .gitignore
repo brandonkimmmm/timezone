@@ -1,7 +1,5 @@
 /node_modules
-/src/config/.env
-database.sqlite3
-:memory
 /logs
 build
-database-dev.sqlite3
+.env
+yarn-error.log

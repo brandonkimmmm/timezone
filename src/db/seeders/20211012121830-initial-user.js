@@ -1,8 +1,7 @@
 'use strict';
 
-const path = require('path');
 const bcrypt = require('bcrypt');
-require('dotenv').config({ path: path.resolve(__dirname, '../../config/.env') });
+require('dotenv').config();
 
 module.exports = {
 	up: async (queryInterface) => {
