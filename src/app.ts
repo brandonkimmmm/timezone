@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
 import userRouter from './api/routes/user.routes';
 import adminRouter from './api/routes/admin.routes';
+import { ApolloServer, gql } from 'apollo-server-express';
 
 const app = express();
 
@@ -43,14 +44,22 @@ app.use(publicRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 
-app.use(async (req, res) => {
-	return res.status(400).json({
-		message: `Path ${req.path} does not exist`
-	});
+import { schema } from './graphql/schema';
+
+const apolloServer = new ApolloServer({
+	schema
 });
 
-app.listen(PORT, () => {
-	logger.info(`Server listening on port ${PORT}`);
+apolloServer.start().then(() => {
+	apolloServer.applyMiddleware({ app, path: '/graphql' });
+	app.use(async (req, res) => {
+		return res.status(400).json({
+			message: `Path ${req.path} does not exist`
+		});
+	});
+	app.listen(PORT, () => {
+		logger.info(`Server listening on port ${PORT}`);
+	});
 });
 
 export default app;

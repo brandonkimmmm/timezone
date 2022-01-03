@@ -1,10 +1,6 @@
 .env.example
-tests
-logs
-node_modules
-build
 .eslintignore
 .eslintrc.json
 .gitignore
-README.md
-yarn-error.log
+Dockerfile
+node_modules
