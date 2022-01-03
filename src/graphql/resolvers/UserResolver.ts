@@ -7,6 +7,7 @@ import {
 	TimezoneSchema
 } from '../../utils/schemas';
 import Joi from 'joi';
+import { getUserById } from '../services/UserService';
 
 const LoginSchema = Joi.object({
 	email: UserSchema.extract('email').required(),
@@ -29,8 +30,22 @@ export const UserResolvers: IResolvers = {
 			}
 		},
 		async getUser(_: void, args: void, { user }): Promise<User> {
-			return user;
-		}
+			try {
+				if (!user) {
+					throw new Error('Not Authorized');
+				}
+
+				const data = await getUserById(user.id, { raw: true });
+
+				if (!data) {
+					throw new Error('User not found');
+				}
+
+				return data;
+			} catch (err) {
+				throw new ApolloError(err instanceof Error ? err.message : '');
+			}
+		},
 	},
 	Mutation: {
 		async signup(_: void, args: MutationSignupArgs): Promise<User> {
