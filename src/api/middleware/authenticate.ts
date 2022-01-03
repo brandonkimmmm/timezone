@@ -59,3 +59,15 @@ export const validateJwtToken = async (req: Request, res: Response, next: NextFu
 		return res.status(401).json({ message: 'Invalid token' });
 	}
 };
+
+export const verifyToken = async (token: string) => {
+	if (!token) return null;
+	try {
+		const decodedToken = await decodeToken(token);
+		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
+		return decodedUser;
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
+};

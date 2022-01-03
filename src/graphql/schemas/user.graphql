@@ -1,0 +1,27 @@
+scalar Date
+
+extend type Query {
+	login(email: String!, password: String!): AuthenticateResponse!
+	getUser: User!
+}
+
+extend type Mutation {
+	signup(email: String!, password: String!): SignupResponse!
+}
+
+type AuthenticateResponse {
+	token: String!
+}
+
+type SignupResponse {
+	id: Int!
+	email: String!
+}
+
+type User {
+	id: Int!
+	email: String!
+	role: String!
+	created_at: Date!
+	updated_at: Date!
+}

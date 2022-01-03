@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
 import userRouter from './api/routes/user.routes';
 import adminRouter from './api/routes/admin.routes';
-import { ApolloServer, gql } from 'apollo-server-express';
+import apolloServer from './graphql';
 
 const app = express();
 
@@ -43,12 +43,6 @@ app.use(async (req, res, next) => {
 app.use(publicRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
-
-import { schema } from './graphql/schema';
-
-const apolloServer = new ApolloServer({
-	schema
-});
 
 apolloServer.start().then(() => {
 	apolloServer.applyMiddleware({ app, path: '/graphql' });

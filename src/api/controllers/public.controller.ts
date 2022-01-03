@@ -88,3 +88,75 @@ export const postLogin = async (req: Request, res: Response) => {
 		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
 	}
 };
+
+export const login = async (email: string, password: string) => {
+	// logger.info(
+	// 	req.nanoid,
+	// 	'api/controllers/public.controllers/postLogin',
+	// 	'email:',
+	// 	email
+	// );
+
+	try {
+		const user = await User.getUserByEmail(email);
+
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		const isValidPassword = await user.verifyPassword(password);
+
+		if (!isValidPassword) {
+			throw new Error('Invalid password given');
+		}
+
+		// logger.verbose(
+		// 	req.nanoid,
+		// 	'api/controllers/public.controllers/postLogin',
+		// 	'user logged in'
+		// );
+
+		const token = await signToken(user.id, user.email, user.role);
+
+		return token;
+	} catch (err) {
+		// logger.error(
+		// 	req.nanoid,
+		// 	'api/controllers/public.controllers/postLogin',
+		// 	err instanceof Error ? err.message : ''
+		// );
+
+		// return res.status(400).json({ message: err instanceof Error ? err.message : '' });
+		throw err;
+	}
+};
+
+export const signup = async (email: string, password: string) => {
+	// logger.info(
+	// 	req.nanoid,
+	// 	'api/controllers/public.controllers/postSignup',
+	// 	'email:',
+	// 	email
+	// );
+
+	try {
+		const user = await User.createUser(email, password);
+
+		// logger.verbose(
+		// 	req.nanoid,
+		// 	'api/controllers/public.controllers/postSignup',
+		// 	`User ${user.email} created`
+		// );
+
+		return omit(user.toJSON(), ['password']);
+	} catch (err) {
+		// logger.error(
+		// 	req.nanoid,
+		// 	'api/controllers/public.controllers/postSignup',
+		// 	err instanceof Error ? err.message : ''
+		// );
+
+		// return res.status(400).json({ message: err instanceof Error ? err.message : '' });
+		throw err;
+	}
+};
