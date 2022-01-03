@@ -6,7 +6,8 @@ import {
 	HasManyGetAssociationsMixin,
 	HasManyCreateAssociationMixin,
 	HasManyHasAssociationMixin,
-	FindOptions
+	FindOptions,
+	Sequelize
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
@@ -18,18 +19,17 @@ export interface UserAttributes {
 	id: number;
 	email: string;
 	password: string;
-	role: Role
+	role: Role;
+	created_at: Date;
+	updated_at: Date;
 }
 
 export type FindUserOpts = FindOptions<UserAttributes>
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role' | 'created_at' | 'updated_at'> {}
 
 export interface UserInstance extends Model<UserAttributes, UserCreationAttributes>,
 	UserAttributes {
-		created_at?: Date;
-		updated_at?: Date;
-
 		getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
 		createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
 		hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
@@ -68,6 +68,16 @@ const User = sequelize.define<UserInstance>(
 			type: DataTypes.ENUM(...VALID_ROLES),
 			allowNull: false,
 			defaultValue: 'user'
+		},
+		created_at: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+		},
+		updated_at: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
 		}
 	}, {
 		tableName: 'Users',
@@ -76,6 +86,9 @@ const User = sequelize.define<UserInstance>(
 				const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
 				user.password = hashedPassword;
 			}
+		},
+		defaultScope: {
+			attributes: { exclude: ['password'] }
 		}
 	}
 );
