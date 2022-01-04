@@ -42,7 +42,7 @@ app.use(publicRouter);
 	await adminServer.start();
 
 	userServer.applyMiddleware({ app, path: '/graphql' });
-	userServer.applyMiddleware({ app, path: '/graphql/admin' });
+	adminServer.applyMiddleware({ app, path: '/graphql/admin' });
 
 	app.use(async (req, res) => {
 		return res.status(400).json({
