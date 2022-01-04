@@ -3,6 +3,7 @@ import { isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../utils/timezones';
 import { getUser } from './UserService';
 import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
+import { UserAttributes } from '../db/models/user';
 
 export const getTimezone = async (opts: FindTimezoneOpts = {}) => {
 	return Timezone.findOne(opts);
@@ -36,8 +37,6 @@ export const createTimezone = async (
 		country
 	);
 
-	const { timezone, offset } = await getCityTimezone(city, country);
-
 	const [existingTimezone] = await user.getTimezones({
 		where: {
 			name,
@@ -48,6 +47,8 @@ export const createTimezone = async (
 	if (existingTimezone) {
 		throw new Error('Timezone with name already exists for user');
 	}
+
+	const { timezone, offset } = await getCityTimezone(city, country);
 
 	return user.createTimezone({
 		name,
@@ -70,90 +71,11 @@ interface UpdateData {
 	timezone?: string;
 }
 
-export const updateUserTimezone = async (
-	user_id: number,
+export const updateTimezone = async (
 	id: number,
-	data: UpdateTimezoneData
+	data: UpdateTimezoneData,
+	user: Pick<UserAttributes, 'id' | 'role'>
 ) => {
-	logger.debug(
-		'api/models/timezone/updateUserTimezone',
-		'user_id:',
-		user_id,
-		'id:',
-		id,
-		'data:',
-		data
-	);
-
-	const user = await getUser({ where: { id: user_id } });
-
-	if (!user) {
-		throw new Error('User not found');
-	}
-
-	const [existingTimezone] = await user.getTimezones({
-		where: {
-			id
-		}
-	});
-
-	// if timezone does not exist, throw an error
-	if (!existingTimezone) {
-		throw new Error('Timezone not found');
-	}
-
-	const country = data.country;
-
-	const givenData = omit(data, 'country');
-
-	const updateData: UpdateData = {};
-
-	for (const field in givenData) {
-		switch (field) {
-			case 'name':
-				if (givenData[field] !== existingTimezone.name) {
-					// check if user already has a timezone with given name
-					const [existingTimezone] = await user.getTimezones({
-						where: {
-							name: givenData[field]
-						}
-					});
-
-					if (existingTimezone) {
-						throw new Error('Timezone with name already exists');
-					}
-
-					updateData.name = givenData[field] as string;
-				}
-				break;
-			case 'city':
-				if (isString(givenData[field])) {
-					// Get timezone of city given
-					const { timezone, offset } = await getCityTimezone(
-						givenData[field] as string,
-						country as string
-					);
-
-					if (timezone !== existingTimezone.timezone) {
-						updateData.city = givenData[field] as string;
-						updateData.timezone = timezone;
-						updateData.offset = offset;
-					}
-				}
-				break;
-		}
-	}
-
-	if (isEmpty(updateData)) {
-		throw new Error('No fields to update');
-	}
-
-	const userTimezone = await existingTimezone.update(updateData);
-
-	return userTimezone;
-};
-
-export const updateTimezone = async (id: number, data: UpdateTimezoneData) => {
 	logger.debug(
 		'api/models/timezone/updateUserTimezone',
 		'id:',
@@ -167,6 +89,10 @@ export const updateTimezone = async (id: number, data: UpdateTimezoneData) => {
 	// if timezone does not exist, throw an error
 	if (!existingTimezone) {
 		throw new Error('Timezone not found');
+	}
+
+	if (user.role !== 'admin' && user.id !== existingTimezone.user_id) {
+		throw new Error('Not Authorized');
 	}
 
 	const country = data.country;
@@ -221,32 +147,10 @@ export const updateTimezone = async (id: number, data: UpdateTimezoneData) => {
 	return userTimezone;
 };
 
-export const deleteUserTimezone = async (user_id: number, id: number) => {
-	const user = await getUser({ where: { id: user_id } });
-
-	if (!user) {
-		throw new Error('User not found');
-	}
-
-	logger.debug('api/models/timezone/deleteUserTimezone', 'user_id:', user_id);
-
-	const [existingTimezone] = await user.getTimezones({
-		where: {
-			id
-		}
-	});
-
-	// throw an error if timezone is not found
-	if (!existingTimezone) {
-		throw new Error('Timezone not found');
-	}
-
-	await existingTimezone.destroy();
-
-	return existingTimezone;
-};
-
-export const deleteTimezone = async (id: number) => {
+export const deleteTimezone = async (
+	id: number,
+	user: Pick<UserAttributes, 'id' | 'role'>
+) => {
 	logger.debug('api/models/timezone/deleteUserTimezone', 'id:', id);
 
 	const existingTimezone = await getTimezone({ where: { id } });
@@ -254,6 +158,10 @@ export const deleteTimezone = async (id: number) => {
 	// throw an error if timezone is not found
 	if (!existingTimezone) {
 		throw new Error('Timezone not found');
+	}
+
+	if (user.role !== 'admin' && user.id !== existingTimezone.user_id) {
+		throw new Error('Not Authorized');
 	}
 
 	await existingTimezone.destroy();
