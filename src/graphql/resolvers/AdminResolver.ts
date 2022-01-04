@@ -52,15 +52,19 @@ const CreateTimezoneSchema = Joi.object({
 
 const UpdateTimezoneSchema = Joi.object({
 	user_id: TimezoneSchema.extract('user_id').required(),
-	name: TimezoneSchema.extract('name').required(),
-	country: TimezoneSchema.extract('country'),
-	updated_name: TimezoneSchema.extract('name').required(),
-	updated_city: TimezoneSchema.extract('city').required()
+	id: TimezoneSchema.extract('id').required(),
+	data: Joi.object({
+		name: TimezoneSchema.extract('name'),
+		city: TimezoneSchema.extract('city'),
+		country: TimezoneSchema.extract('country')
+	})
+		.required()
+		.min(1)
 });
 
 const DeleteTimezoneSchema = Joi.object({
 	user_id: TimezoneSchema.extract('user_id').required(),
-	name: TimezoneSchema.extract('name').required()
+	id: TimezoneSchema.extract('id').required()
 });
 
 export const AdminResolvers: IResolvers = {
@@ -185,13 +189,9 @@ export const AdminResolvers: IResolvers = {
 				if (!user || user.role !== 'admin') {
 					throw new Error('Not Authorized');
 				}
-				const { user_id, name, updated_name, updated_city, country } =
+				const { user_id, id, data } =
 					await UpdateTimezoneSchema.validateAsync(args);
-				return updateUserTimezone(user_id, name, {
-					updated_name,
-					updated_city,
-					country
-				});
+				return updateUserTimezone(user_id, id, data);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}
@@ -205,9 +205,9 @@ export const AdminResolvers: IResolvers = {
 				if (!user || user.role !== 'admin') {
 					throw new Error('Not Authorized');
 				}
-				const { user_id, name } =
+				const { user_id, id } =
 					await DeleteTimezoneSchema.validateAsync(args);
-				return deleteUserTimezone(user_id, name);
+				return deleteUserTimezone(user_id, id);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

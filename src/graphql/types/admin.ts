@@ -43,7 +43,7 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteTimezoneArgs = {
-  name: Scalars['String'];
+  id: Scalars['Int'];
   user_id: Scalars['Int'];
 };
 
@@ -54,10 +54,8 @@ export type MutationDeleteUserArgs = {
 
 
 export type MutationUpdateTimezoneArgs = {
-  country?: InputMaybe<Scalars['String']>;
-  name: Scalars['String'];
-  updated_city: Scalars['String'];
-  updated_name: Scalars['String'];
+  data?: InputMaybe<UpdateTimezoneData>;
+  id: Scalars['Int'];
   user_id: Scalars['Int'];
 };
 
@@ -94,6 +92,12 @@ export type Timezone = {
   offset: Scalars['String'];
   timezone: Scalars['String'];
   updated_at: Scalars['Date'];
+};
+
+export type UpdateTimezoneData = {
+  city?: InputMaybe<Scalars['String']>;
+  country?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
 };
 
 export type User = {
@@ -181,6 +185,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Timezone: ResolverTypeWrapper<Timezone>;
+  UpdateTimezoneData: UpdateTimezoneData;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -193,6 +198,7 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars['String'];
   Timezone: Timezone;
+  UpdateTimezoneData: UpdateTimezoneData;
   User: User;
 };
 
@@ -204,9 +210,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationCreateTimezoneArgs, 'city' | 'name' | 'user_id'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'email' | 'password' | 'password_confirmation'>>;
-  deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'name' | 'user_id'>>;
+  deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'id' | 'user_id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
-  updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'name' | 'updated_city' | 'updated_name' | 'user_id'>>;
+  updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'id' | 'user_id'>>;
   updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'role'>>;
 };
 

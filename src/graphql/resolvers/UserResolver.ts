@@ -13,18 +13,29 @@ import { getUserById } from '../../services/UserService';
 import {
 	getUserTimezones,
 	createUserTimezone,
-	updateUserTimezone
+	updateUserTimezone,
+	deleteUserTimezone
 } from '../../services/TimezoneService';
 
 const CreateUserTimezoneSchema = Joi.object({
 	name: TimezoneSchema.extract('name').required(),
-	country: TimezoneSchema.extract('country'),
-	updated_name: TimezoneSchema.extract('name').required(),
-	updated_city: TimezoneSchema.extract('city').required()
+	city: TimezoneSchema.extract('city').required(),
+	country: TimezoneSchema.extract('country')
+});
+
+const UpdateUserTimezoneSchema = Joi.object({
+	id: TimezoneSchema.extract('id').required(),
+	data: Joi.object({
+		name: TimezoneSchema.extract('name'),
+		city: TimezoneSchema.extract('city'),
+		country: TimezoneSchema.extract('country')
+	})
+		.required()
+		.min(1)
 });
 
 const DeleteUserTimezoneSchema = Joi.object({
-	name: TimezoneSchema.extract('name').required()
+	id: TimezoneSchema.extract('id').required()
 });
 
 export const UserResolvers: IResolvers = {
@@ -84,13 +95,9 @@ export const UserResolvers: IResolvers = {
 				if (!user) {
 					throw new Error('Not Authorized');
 				}
-				const { name, updated_name, updated_city, country } =
-					await CreateUserTimezoneSchema.validateAsync(args);
-				return updateUserTimezone(user.id, name, {
-					updated_name,
-					updated_city,
-					country
-				});
+				const { id, data } =
+					await UpdateUserTimezoneSchema.validateAsync(args);
+				return updateUserTimezone(user.id, id, data);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}
@@ -104,10 +111,10 @@ export const UserResolvers: IResolvers = {
 				if (!user) {
 					throw new Error('Not Authorized');
 				}
-				const { name } = await DeleteUserTimezoneSchema.validateAsync(
+				const { id } = await DeleteUserTimezoneSchema.validateAsync(
 					args
 				);
-				return updateUserTimezone(user.id, name);
+				return deleteUserTimezone(user.id, id);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

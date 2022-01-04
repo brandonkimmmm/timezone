@@ -37,15 +37,13 @@ export type MutationCreateTimezoneArgs = {
 
 
 export type MutationDeleteTimezoneArgs = {
-  name: Scalars['String'];
+  id: Scalars['Int'];
 };
 
 
 export type MutationUpdateTimezoneArgs = {
-  country?: InputMaybe<Scalars['String']>;
-  name: Scalars['String'];
-  updated_city: Scalars['String'];
-  updated_name: Scalars['String'];
+  data?: InputMaybe<UpdateTimezoneData>;
+  id: Scalars['Int'];
 };
 
 export type Query = {
@@ -64,6 +62,12 @@ export type Timezone = {
   offset: Scalars['String'];
   timezone: Scalars['String'];
   updated_at: Scalars['Date'];
+};
+
+export type UpdateTimezoneData = {
+  city?: InputMaybe<Scalars['String']>;
+  country?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
 };
 
 export type User = {
@@ -152,6 +156,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Timezone: ResolverTypeWrapper<Timezone>;
+  UpdateTimezoneData: UpdateTimezoneData;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -165,6 +170,7 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars['String'];
   Timezone: Timezone;
+  UpdateTimezoneData: UpdateTimezoneData;
   User: User;
 };
 
@@ -180,8 +186,8 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationCreateTimezoneArgs, 'city' | 'name'>>;
-  deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'name'>>;
-  updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'name' | 'updated_city' | 'updated_name'>>;
+  deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'id'>>;
+  updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'id'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

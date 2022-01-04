@@ -5,8 +5,8 @@ extend type Query {
 
 extend type Mutation {
 	createTimezone(name: String!, city: String!, country: String): Timezone!
-	updateTimezone(name: String!, updated_name: String!, updated_city: String!, country: String): Timezone!
-	deleteTimezone(name: String!): Timezone!
+	updateTimezone(id: Int!, data: UpdateTimezoneData): Timezone!
+	deleteTimezone(id: Int!): Timezone!
 }
 
 type AuthenticateResponse {
