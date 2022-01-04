@@ -23,7 +23,22 @@ export type AuthenticateResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']>;
+  createTimezone: Timezone;
+  deleteTimezone: Timezone;
   signup: User;
+  updateTimezone: Timezone;
+};
+
+
+export type MutationCreateTimezoneArgs = {
+  city: Scalars['String'];
+  country?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+};
+
+
+export type MutationDeleteTimezoneArgs = {
+  name: Scalars['String'];
 };
 
 
@@ -33,9 +48,18 @@ export type MutationSignupArgs = {
   password_confirmation: Scalars['String'];
 };
 
+
+export type MutationUpdateTimezoneArgs = {
+  country?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  updated_city: Scalars['String'];
+  updated_name: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']>;
+  getTimezones: Array<Maybe<Timezone>>;
   getUser: User;
   login: AuthenticateResponse;
 };
@@ -44,6 +68,17 @@ export type Query = {
 export type QueryLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type Timezone = {
+  __typename?: 'Timezone';
+  city: Scalars['String'];
+  created_at: Scalars['Date'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  offset: Scalars['String'];
+  timezone: Scalars['String'];
+  updated_at: Scalars['Date'];
 };
 
 export type User = {
@@ -131,6 +166,7 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Timezone: ResolverTypeWrapper<Timezone>;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -143,6 +179,7 @@ export type ResolversParentTypes = {
   Mutation: {};
   Query: {};
   String: Scalars['String'];
+  Timezone: Timezone;
   User: User;
 };
 
@@ -157,13 +194,28 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationCreateTimezoneArgs, 'city' | 'name'>>;
+  deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'name'>>;
   signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'password_confirmation'>>;
+  updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'name' | 'updated_city' | 'updated_name'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  getTimezones?: Resolver<Array<Maybe<ResolversTypes['Timezone']>>, ParentType, ContextType>;
   getUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   login?: Resolver<ResolversTypes['AuthenticateResponse'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'email' | 'password'>>;
+};
+
+export type TimezoneResolvers<ContextType = any, ParentType extends ResolversParentTypes['Timezone'] = ResolversParentTypes['Timezone']> = {
+  city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  offset?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  timezone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updated_at?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -180,6 +232,7 @@ export type Resolvers<ContextType = any> = {
   Date?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Timezone?: TimezoneResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

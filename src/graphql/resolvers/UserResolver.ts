@@ -34,7 +34,7 @@ export const UserResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 
-				const data = await getUserById(user.id, { raw: true });
+				const data = await getUserById(user.id);
 
 				if (!data) {
 					throw new Error('User not found');

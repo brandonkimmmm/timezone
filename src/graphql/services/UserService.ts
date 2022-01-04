@@ -180,5 +180,5 @@ export const signupUser = async (email: string, password: string) => {
 
 	const user = await createUser(validatedData.email, validatedData.password);
 
-	return user.toJSON();
+	return user;
 };

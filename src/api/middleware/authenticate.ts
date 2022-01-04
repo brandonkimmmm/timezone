@@ -67,7 +67,6 @@ export const verifyToken = async (token: string) => {
 		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
 		return decodedUser;
 	} catch (err) {
-		console.log(err);
 		return null;
 	}
 };

@@ -1,0 +1,21 @@
+scalar Date
+
+extend type Query {
+	getTimezones: [Timezone]!
+}
+
+extend type Mutation {
+	createTimezone(name: String!, city: String!, country: String): Timezone!
+	updateTimezone(name: String!, updated_name: String!, updated_city: String!, country: String): Timezone!
+	deleteTimezone(name: String!): Timezone!
+}
+
+type Timezone {
+	id: Int!
+	name: String!
+	city: String!
+	timezone: String!
+	offset: String!
+	created_at: Date!
+	updated_at: Date!
+}

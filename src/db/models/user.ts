@@ -30,6 +30,8 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role' 
 
 export interface UserInstance extends Model<UserAttributes, UserCreationAttributes>,
 	UserAttributes {
+		timezones: [TimezoneInstance];
+
 		getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
 		createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
 		hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
