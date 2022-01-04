@@ -9,6 +9,6 @@ extend type Mutation {
 	createUser(email: String!, password: String!, password_confirmation: String!): User!
 	deleteUser(id: Int!): User!
 	createTimezone(user_id: Int!, name: String!, city: String!, country: String): Timezone!
-	updateTimezone(user_id: Int!, id: Int!, data: UpdateTimezoneData): Timezone!
-	deleteTimezone(user_id: Int!, id: Int!): Timezone!
+	updateTimezone(user_id: Int!, id: Int!, data: UpdateTimezoneData!): Timezone!
+	deleteTimezone(id: Int!): Timezone!
 }

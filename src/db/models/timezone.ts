@@ -9,6 +9,7 @@ interface TimezoneAttributes {
 	offset: string;
 	created_at: Date;
 	updated_at: Date;
+	user_id: number;
 }
 
 export type FindTimezoneOpts = FindOptions<TimezoneAttributes>;
@@ -61,6 +62,10 @@ const Timezone = sequelize.define<TimezoneInstance>(
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+		},
+		user_id: {
+			type: DataTypes.INTEGER,
+			allowNull: false
 		}
 	},
 	{

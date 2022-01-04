@@ -2,9 +2,28 @@ import logger from '../utils/logger';
 import { isInteger, isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../utils/timezones';
 import { getUserById } from './UserService';
-import { FindTimezoneOpts } from '../db/models/timezone';
+import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
 import { TimezoneSchema } from '../utils/schemas';
 import Joi from 'joi';
+
+const getTimezone = async (opts: FindTimezoneOpts = {}) => {
+	return Timezone.findOne(opts);
+};
+
+export const getTimezoneById = async (
+	id: number,
+	opts: FindTimezoneOpts = {}
+) => {
+	const validatedId = await TimezoneSchema.extract('id')
+		.required()
+		.validateAsync(id);
+
+	logger.debug('api/models/timezone/getUserTimezones', 'id:', validatedId);
+
+	const timezone = await Timezone.findByPk(id, opts);
+
+	return timezone;
+};
 
 export const getUserTimezones = async (
 	user_id: number,
@@ -198,6 +217,87 @@ export const updateUserTimezone = async (
 	return userTimezone;
 };
 
+export const updateTimezone = async (id: number, data: UpdateTimezoneData) => {
+	const validatedData = await Joi.object({
+		id: TimezoneSchema.extract('id').required(),
+		data: Joi.object({
+			name: TimezoneSchema.extract('name'),
+			city: TimezoneSchema.extract('city'),
+			country: TimezoneSchema.extract('country')
+		})
+			.required()
+			.min(1)
+	}).validateAsync({ id, data });
+
+	logger.debug(
+		'api/models/timezone/updateUserTimezone',
+		'id:',
+		validatedData.id,
+		'data:',
+		validatedData.data
+	);
+
+	const existingTimezone = await getTimezoneById(id);
+
+	// if timezone does not exist, throw an error
+	if (!existingTimezone) {
+		throw new Error('Timezone not found');
+	}
+
+	const country = validatedData.data.country;
+
+	const givenData = omit(validatedData.data, 'country');
+
+	const updateData: UpdateData = {};
+
+	for (const field in givenData) {
+		const value = givenData[field].toLowerCase().trim();
+
+		switch (field) {
+			case 'name':
+				if (value !== existingTimezone.name) {
+					// check if user already has a timezone with given name
+					const timezone = await getTimezone({
+						where: {
+							name: value,
+							user_id: existingTimezone.user_id
+						}
+					});
+
+					if (timezone) {
+						throw new Error('Timezone with name already exists');
+					}
+
+					updateData.name = value;
+				}
+				break;
+			case 'city':
+				if (isString(value)) {
+					// Get timezone of city given
+					const { timezone, offset } = await getCityTimezone(
+						value,
+						country as string
+					);
+
+					if (timezone !== existingTimezone.timezone) {
+						updateData.city = value;
+						updateData.timezone = timezone;
+						updateData.offset = offset;
+					}
+				}
+				break;
+		}
+	}
+
+	if (isEmpty(updateData)) {
+		throw new Error('No fields to update');
+	}
+
+	const userTimezone = await existingTimezone.update(updateData);
+
+	return userTimezone;
+};
+
 export const deleteUserTimezone = async (user_id: number, id: number) => {
 	const validatedData = await Joi.object({
 		user_id: TimezoneSchema.extract('user_id').required(),
@@ -223,6 +323,25 @@ export const deleteUserTimezone = async (user_id: number, id: number) => {
 			id: validatedData.id
 		}
 	});
+
+	// throw an error if timezone is not found
+	if (!existingTimezone) {
+		throw new Error('Timezone not found');
+	}
+
+	await existingTimezone.destroy();
+
+	return existingTimezone;
+};
+
+export const deleteTimezone = async (id: number) => {
+	const validatedId = await TimezoneSchema.extract('id')
+		.required()
+		.validateAsync(id);
+
+	logger.debug('api/models/timezone/deleteUserTimezone', 'id:', validatedId);
+
+	const existingTimezone = await getTimezoneById(id);
 
 	// throw an error if timezone is not found
 	if (!existingTimezone) {
