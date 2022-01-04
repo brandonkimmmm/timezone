@@ -11,7 +11,11 @@ import {
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
-import { PASSWORD_REGEX, SALT_ROUNDS, VALID_ROLES } from '../../config/constants';
+import {
+	PASSWORD_REGEX,
+	SALT_ROUNDS,
+	VALID_ROLES
+} from '../../config/constants';
 
 export type Role = 'admin' | 'user';
 
@@ -24,23 +28,28 @@ export interface UserAttributes {
 	updated_at: Date;
 }
 
-export type FindUserOpts = FindOptions<UserAttributes>
+export type FindUserOpts = FindOptions<UserAttributes>;
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role' | 'created_at' | 'updated_at'> {}
+interface UserCreationAttributes
+	extends Optional<
+		UserAttributes,
+		'id' | 'role' | 'created_at' | 'updated_at'
+	> {}
 
-export interface UserInstance extends Model<UserAttributes, UserCreationAttributes>,
-	UserAttributes {
-		timezones: [TimezoneInstance];
+export interface UserInstance
+	extends Model<UserAttributes, UserCreationAttributes>,
+		UserAttributes {
+	timezones: [TimezoneInstance];
 
-		getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
-		createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
-		hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
+	getTimezones: HasManyGetAssociationsMixin<TimezoneInstance>;
+	createTimezone: HasManyCreateAssociationMixin<TimezoneInstance>;
+	hasTimezone: HasManyHasAssociationMixin<TimezoneInstance, number>;
 
+	verifyPassword: (password: string) => Promise<boolean>;
+	prototype: {
 		verifyPassword: (password: string) => Promise<boolean>;
-		prototype: {
-			verifyPassword: (password: string) => Promise<boolean>;
-		}
-	}
+	};
+}
 
 const User = sequelize.define<UserInstance>(
 	'User',
@@ -81,11 +90,15 @@ const User = sequelize.define<UserInstance>(
 			allowNull: false,
 			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
 		}
-	}, {
+	},
+	{
 		tableName: 'Users',
 		hooks: {
 			beforeCreate: async (user: UserInstance) => {
-				const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+				const hashedPassword = await bcrypt.hash(
+					user.password,
+					SALT_ROUNDS
+				);
 				user.password = hashedPassword;
 			}
 		},
