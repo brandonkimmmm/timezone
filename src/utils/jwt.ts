@@ -1,8 +1,12 @@
-import jwt, { JwtPayload }  from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/constants';
 import P from 'bluebird';
 
-export const signToken = async (id: number, email: string, role: string): Promise<string> => {
+export const signToken = async (
+	id: number,
+	email: string,
+	role: string
+): Promise<string> => {
 	return new P((resolve, reject) => {
 		jwt.sign(
 			{
@@ -22,7 +26,9 @@ export const signToken = async (id: number, email: string, role: string): Promis
 	});
 };
 
-export const decodeToken = async (token: string): Promise<JwtPayload | undefined> => {
+export const decodeToken = async (
+	token: string
+): Promise<JwtPayload | undefined> => {
 	return new Promise((resolve, reject) => {
 		jwt.verify(token, JWT_SECRET, (err, decoded) => {
 			if (err) reject(err);

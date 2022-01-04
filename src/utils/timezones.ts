@@ -17,7 +17,10 @@ interface Timezone {
 	current_time: string;
 }
 
-export const getCityTimezone = async (city: string, country?: string): Promise<CityTimezone> => {
+export const getCityTimezone = async (
+	city: string,
+	country?: string
+): Promise<CityTimezone> => {
 	city = await TimezoneSchema.extract('city').required().validateAsync(city);
 	country = await TimezoneSchema.extract('country').validateAsync(country);
 
@@ -48,7 +51,9 @@ export const getCurrentTime = (timezone: string): string => {
 	return DateTime.now().setZone(timezone).toFormat('FFF');
 };
 
-export const formatTimezones = async (timezones: TimezoneInstance[]): Promise<Timezone[]> => {
+export const formatTimezones = async (
+	timezones: TimezoneInstance[]
+): Promise<Timezone[]> => {
 	return timezones.map((timezone) => {
 		return {
 			name: timezone.name,

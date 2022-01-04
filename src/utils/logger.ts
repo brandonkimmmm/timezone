@@ -7,22 +7,28 @@ import path from 'path';
 
 const level = NODE_ENV === 'production' ? 'info' : 'debug';
 
-const formatObject = (data: string | object): string => isObject(data) ? JSON.stringify(data) : data;
+const formatObject = (data: string | object): string =>
+	isObject(data) ? JSON.stringify(data) : data;
 
-const customFormat = winston.format((info: winston.LogEntry): winston.LogEntry => {
-	const splat = info[SPLAT as any] || [];
-	const message = formatObject(info.message);
-	const rest = splat.map(formatObject).join(' ');
-	info.message = `${message} ${rest}`;
-	return info;
-});
+const customFormat = winston.format(
+	(info: winston.LogEntry): winston.LogEntry => {
+		const splat = info[SPLAT as any] || [];
+		const message = formatObject(info.message);
+		const rest = splat.map(formatObject).join(' ');
+		info.message = `${message} ${rest}`;
+		return info;
+	}
+);
 
 const logFormat = winston.format.combine(
 	customFormat(),
 	winston.format.timestamp(),
 	winston.format.colorize(),
 	winston.format.align(),
-	winston.format.printf((info) => `${info.timestamp} ${info.level}: ${formatObject(info.message)}`)
+	winston.format.printf(
+		(info) =>
+			`${info.timestamp} ${info.level}: ${formatObject(info.message)}`
+	)
 );
 
 const rotateTransport: DailyRotateFile = new DailyRotateFile({

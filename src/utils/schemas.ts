@@ -1,21 +1,11 @@
 import Joi from 'joi';
 import { PASSWORD_REGEX } from '../config/constants';
 
-const IdSchema = Joi.number()
-	.integer()
-	.min(0)
-	.not(0)
-	.label('id');
+const IdSchema = Joi.number().integer().min(0).not(0).label('id');
 
-const EmailSchema = Joi.string()
-	.email()
-	.trim()
-	.lowercase()
-	.label('email');
+const EmailSchema = Joi.string().email().trim().lowercase().label('email');
 
-const PasswordSchema = Joi.string()
-	.pattern(PASSWORD_REGEX)
-	.label('password');
+const PasswordSchema = Joi.string().pattern(PASSWORD_REGEX).label('password');
 
 const RoleSchema = Joi.string()
 	.trim()
@@ -23,17 +13,9 @@ const RoleSchema = Joi.string()
 	.valid('admin', 'user')
 	.label('role');
 
-const TimezoneNameSchema = Joi.string()
-	.min(2)
-	.trim()
-	.lowercase()
-	.label('name');
+const TimezoneNameSchema = Joi.string().min(2).trim().lowercase().label('name');
 
-const CitySchema = Joi.string()
-	.min(2)
-	.trim()
-	.lowercase()
-	.label('city');
+const CitySchema = Joi.string().min(2).trim().lowercase().label('city');
 
 const CountrySchema = Joi.string()
 	.length(2)
@@ -41,19 +23,17 @@ const CountrySchema = Joi.string()
 	.uppercase()
 	.label('country');
 
-export const UserSchema = Joi
-	.object({
-		id: IdSchema,
-		email: EmailSchema,
-		password: PasswordSchema,
-		role: RoleSchema
-	});
+export const UserSchema = Joi.object({
+	id: IdSchema,
+	email: EmailSchema,
+	password: PasswordSchema,
+	role: RoleSchema
+});
 
-export const TimezoneSchema = Joi
-	.object({
-		id: IdSchema,
-		name: TimezoneNameSchema,
-		city: CitySchema,
-		country: CountrySchema,
-		user_id: IdSchema.label('user_id')
-	});
+export const TimezoneSchema = Joi.object({
+	id: IdSchema,
+	name: TimezoneNameSchema,
+	city: CitySchema,
+	country: CountrySchema,
+	user_id: IdSchema.label('user_id')
+});
