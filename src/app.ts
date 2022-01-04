@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
 import userRouter from './api/routes/user.routes';
 import adminRouter from './api/routes/admin.routes';
-import { userServer } from './graphql';
+import { userServer, adminServer } from './graphql';
 
 const app = express();
 
@@ -41,8 +41,13 @@ app.use(publicRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 
-userServer.start().then(() => {
+(async () => {
+	await userServer.start();
+	await adminServer.start();
+
 	userServer.applyMiddleware({ app, path: '/graphql' });
+	userServer.applyMiddleware({ app, path: '/graphql/admin' });
+
 	app.use(async (req, res) => {
 		return res.status(400).json({
 			message: `Path ${req.path} does not exist`
@@ -51,6 +56,6 @@ userServer.start().then(() => {
 	app.listen(PORT, () => {
 		logger.info(`Server listening on port ${PORT}`);
 	});
-});
+})();
 
 export default app;
