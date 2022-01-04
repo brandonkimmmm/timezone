@@ -1,0 +1,14 @@
+extend type Query {
+	getUsers: [User]!
+	getUser(user_id: Int!): User!
+	getTimezones(user_id: Int!): [Timezone]!
+}
+
+extend type Mutation {
+	updateUser(user_id: Int!): User!
+	createUser: User!
+	deleteUser: User!
+	createTimezone(user_id: Int!, name: String!, city: String!, country: String): Timezone!
+	updateTimezone(user_id: Int!, name: String!, updated_name: String!, updated_city: String!, country: String): Timezone!
+	deleteTimezone(name: String!): Timezone!
+}
