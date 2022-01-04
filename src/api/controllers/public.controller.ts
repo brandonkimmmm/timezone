@@ -1,6 +1,6 @@
 import logger from '../../utils/logger';
 import { Request, Response } from 'express';
-import { loginUser, createUser } from '../../services/UserService';
+import { loginUser, createUser } from '../../services/user.service';
 
 export const getHealth = async (req: Request, res: Response) => {
 	return res.json({

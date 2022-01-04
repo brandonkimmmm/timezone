@@ -9,13 +9,13 @@ import {
 import { ApolloError } from 'apollo-server-express';
 import { TimezoneSchema } from '../../utils/schemas';
 import Joi from 'joi';
-import { getUser } from '../../services/UserService';
+import { getUser } from '../../services/user.service';
 import {
 	getTimezones,
 	createTimezone,
 	updateTimezone,
 	deleteTimezone
-} from '../../services/TimezoneService';
+} from '../../services/timezone.service';
 
 const CreateUserTimezoneSchema = Joi.object({
 	name: TimezoneSchema.extract('name').required(),

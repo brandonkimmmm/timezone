@@ -1,7 +1,7 @@
 import logger from '../utils/logger';
 import { isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../utils/timezones';
-import { getUser } from './UserService';
+import { getUser } from './user.service';
 import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
 import { UserAttributes } from '../db/models/user';
 

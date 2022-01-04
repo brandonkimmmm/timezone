@@ -1,7 +1,7 @@
 import 'graphql-import-node';
-import * as commonTypeDefs from './common.gql';
-import * as userTypeDefs from './user.gql';
-import * as adminTypeDefs from './admin.gql';
+import * as commonTypeDefs from './common.schema.gql';
+import * as userTypeDefs from './user.schema.gql';
+import * as adminTypeDefs from './admin.schema.gql';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { userResolvers, adminResolvers } from '../resolvers';
 import { GraphQLSchema } from 'graphql';

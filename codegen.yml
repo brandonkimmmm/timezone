@@ -1,16 +1,16 @@
 overwrite: true
-schema: './src/graphql/schemas/common.gql'
+schema: './src/graphql/schemas/common.schema.gql'
 config:
   scalars:
     Date: Date
 generates:
   ./src/graphql/types/user.ts:
-    schema: './src/graphql/schemas/user.gql'
+    schema: './src/graphql/schemas/user.schema.gql'
     plugins:
       - 'typescript'
       - 'typescript-resolvers'
   ./src/graphql/types/admin.ts:
-    schema: './src/graphql/schemas/admin.gql'
+    schema: './src/graphql/schemas/admin.schema.gql'
     plugins:
       - 'typescript'
       - 'typescript-resolvers'
