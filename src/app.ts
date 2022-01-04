@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
 import userRouter from './api/routes/user.routes';
 import adminRouter from './api/routes/admin.routes';
-import apolloServer from './graphql';
+import { clientServer } from './graphql';
 
 const app = express();
 
@@ -44,8 +44,8 @@ app.use(publicRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 
-apolloServer.start().then(() => {
-	apolloServer.applyMiddleware({ app, path: '/graphql' });
+clientServer.start().then(() => {
+	clientServer.applyMiddleware({ app, path: '/graphql' });
 	app.use(async (req, res) => {
 		return res.status(400).json({
 			message: `Path ${req.path} does not exist`

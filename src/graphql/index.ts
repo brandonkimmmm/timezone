@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import schema from './schemas';
 import { verifyToken } from '../api/middleware/authenticate';
 
-const apolloServer = new ApolloServer({
+export const clientServer = new ApolloServer({
 	schema,
 	context: async ({ req }) => {
 		const token = req.get('Authorization') || '';
@@ -11,4 +11,4 @@ const apolloServer = new ApolloServer({
 	introspection: true
 });
 
-export default apolloServer;
+// export const adminServer = new 
