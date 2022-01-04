@@ -1,13 +1,12 @@
 import { IResolvers } from '@graphql-tools/utils';
 import { AuthenticateResponse, QueryLoginArgs, User, MutationSignupArgs } from '../types';
-import { login, signup } from '../controllers/UserController';
 import { ApolloError } from 'apollo-server-express';
 import {
 	UserSchema,
 	TimezoneSchema
 } from '../../utils/schemas';
 import Joi from 'joi';
-import { getUserById } from '../services/UserService';
+import { getUserById, loginUser, signupUser } from '../services/UserService';
 
 const LoginSchema = Joi.object({
 	email: UserSchema.extract('email').required(),
@@ -23,7 +22,7 @@ export const UserResolvers: IResolvers = {
 		async login(_: void, args: QueryLoginArgs): Promise<AuthenticateResponse> {
 			try {
 				const { email, password } = await LoginSchema.validateAsync(args);
-				const token = await login(email, password);
+				const token = await loginUser(email, password);
 				return { token };
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
@@ -51,7 +50,7 @@ export const UserResolvers: IResolvers = {
 		async signup(_: void, args: MutationSignupArgs): Promise<User> {
 			try {
 				const { email, password } = await SignupSchema.validateAsync(args);
-				return signup(email, password);
+				return signupUser(email, password);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}
