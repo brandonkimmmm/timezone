@@ -11,7 +11,7 @@ import { TimezoneSchema } from '../../utils/schemas';
 import Joi from 'joi';
 import { getUser } from '../../services/UserService';
 import {
-	getUserTimezones,
+	getTimezones,
 	createUserTimezone,
 	updateUserTimezone,
 	deleteUserTimezone
@@ -63,7 +63,7 @@ export const UserResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 
-				return getUserTimezones(user.id);
+				return getTimezones({ where: { user_id: user.id } });
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

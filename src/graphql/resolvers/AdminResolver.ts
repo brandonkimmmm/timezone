@@ -24,7 +24,7 @@ import {
 import {
 	createUserTimezone,
 	deleteUserTimezone,
-	getUserTimezones,
+	getTimezones,
 	updateUserTimezone
 } from '../../services/TimezoneService';
 
@@ -111,7 +111,7 @@ export const AdminResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 				const { id } = await GetUserSchema.validateAsync(args);
-				return getUserTimezones(id);
+				return getTimezones({ where: { user_id: id } });
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

@@ -1,6 +1,6 @@
 import logger from '../../utils/logger';
 import { Request, Response } from 'express';
-import { loginUser, signupUser } from '../../services/UserService';
+import { loginUser, createUser } from '../../services/UserService';
 
 export const getHealth = async (req: Request, res: Response) => {
 	return res.json({
@@ -20,7 +20,7 @@ export const postSignup = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await signupUser(email, password);
+		const user = await createUser(email, password);
 
 		logger.verbose(
 			req.nanoid,
