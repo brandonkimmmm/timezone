@@ -2,7 +2,7 @@ import logger from '../../utils/logger';
 import { Request, Response } from 'express';
 import { loginUser, signupUser } from '../../services/UserService';
 
-export const getInfo = async (req: Request, res: Response) => {
+export const getHealth = async (req: Request, res: Response) => {
 	return res.json({
 		name: process.env.npm_package_name,
 		version: process.env.npm_package_version
