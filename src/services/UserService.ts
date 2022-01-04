@@ -4,42 +4,14 @@ import { UserSchema } from '../utils/schemas';
 import Joi from 'joi';
 import { signToken } from '../utils/jwt';
 
-export const getUserById = async (id: number, opts: FindUserOpts = {}) => {
-	const validatedId = await UserSchema.extract('id')
-		.required()
-		.validateAsync(id);
-
-	logger.debug('api/models/user/getUserById', 'id:', validatedId);
-
-	const user = await User.findByPk(validatedId, opts);
-
-	return user;
-};
-
-export const getUserByEmail = async (
-	email: string,
-	opts: FindUserOpts = {}
-) => {
-	const validatedEmail = await UserSchema.extract('email')
-		.required()
-		.validateAsync(email);
-
-	logger.debug('api/models/user/getUserByEmail', 'email:', validatedEmail);
-
-	const user = await User.findOne({
-		where: { email: validatedEmail },
-		...opts
-	});
-
-	return user;
+export const getUser = async (opts: FindUserOpts = {}) => {
+	logger.debug('api/models/user/getUserById', 'opts:', opts);
+	return User.findOne(opts);
 };
 
 export const getUsers = async (opts: FindUserOpts = {}) => {
 	logger.debug('api/models/user/getUsers');
-
-	const users = await User.findAll(opts);
-
-	return users;
+	return User.findAll(opts);
 };
 
 export const createUser = async (
@@ -61,7 +33,9 @@ export const createUser = async (
 		validatedData.role
 	);
 
-	const existingUser = await getUserByEmail(validatedData.email);
+	const existingUser = await getUser({
+		where: { email: validatedData.email }
+	});
 
 	if (existingUser) {
 		throw new Error(`User ${validatedData.email} already exists`);
@@ -94,7 +68,7 @@ export const updateUserRole = async (id: number, role: Role) => {
 		validatedData.role
 	);
 
-	const user = await getUserById(validatedData.id);
+	const user = await getUser({ where: { id: validatedData.id } });
 
 	if (!user) {
 		throw new Error('User not found');
@@ -125,7 +99,7 @@ export const deleteUser = async (id: number) => {
 
 	logger.debug('api/models/user/deleteUser', 'id:', validatedId);
 
-	const user = await getUserById(validatedId);
+	const user = await getUser({ where: { id: validatedId } });
 
 	if (!user) {
 		throw new Error('User not found');
@@ -142,7 +116,7 @@ export const loginUser = async (email: string, password: string) => {
 		role: UserSchema.extract('password').required()
 	}).validateAsync({ email, password });
 
-	const user = await getUserByEmail(validatedData.email);
+	const user = await getUser({ where: { email: validatedData.email } });
 
 	if (!user) {
 		throw new Error('User not found');

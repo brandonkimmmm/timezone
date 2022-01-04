@@ -17,7 +17,7 @@ import Joi from 'joi';
 import {
 	createUser,
 	deleteUser,
-	getUserById,
+	getUser,
 	getUsers,
 	updateUserRole
 } from '../../services/UserService';
@@ -79,7 +79,7 @@ export const AdminResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 				const { id } = await GetUserSchema.validateAsync(args);
-				const data = await getUserById(id);
+				const data = await getUser({ where: { id } });
 
 				if (!data) {
 					throw new Error('User not found');

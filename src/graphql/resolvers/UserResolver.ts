@@ -9,7 +9,7 @@ import {
 import { ApolloError } from 'apollo-server-express';
 import { TimezoneSchema } from '../../utils/schemas';
 import Joi from 'joi';
-import { getUserById } from '../../services/UserService';
+import { getUser } from '../../services/UserService';
 import {
 	getUserTimezones,
 	createUserTimezone,
@@ -46,7 +46,7 @@ export const UserResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 
-				const data = await getUserById(user.id);
+				const data = await getUser({ where: { id: user.id } });
 
 				if (!data) {
 					throw new Error('User not found');

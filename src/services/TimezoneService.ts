@@ -1,7 +1,7 @@
 import logger from '../utils/logger';
 import { isInteger, isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../utils/timezones';
-import { getUserById } from './UserService';
+import { getUser } from './UserService';
 import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
 import { TimezoneSchema } from '../utils/schemas';
 import Joi from 'joi';
@@ -39,7 +39,7 @@ export const getUserTimezones = async (
 		validatedUserId
 	);
 
-	const user = await getUserById(validatedUserId);
+	const user = await getUser({ where: { id: validatedUserId } });
 
 	if (!user) {
 		throw new Error('User not found');
@@ -63,7 +63,7 @@ export const createUserTimezone = async (
 		country: TimezoneSchema.extract('country')
 	}).validateAsync({ user_id, name, city, country });
 
-	const user = await getUserById(validatedData.user_id);
+	const user = await getUser({ where: { id: validatedData.user_id } });
 
 	if (!user) {
 		throw new Error('User not found');
@@ -147,7 +147,7 @@ export const updateUserTimezone = async (
 		validatedData.data
 	);
 
-	const user = await getUserById(validatedData.user_id);
+	const user = await getUser({ where: { id: validatedData.user_id } });
 
 	if (!user) {
 		throw new Error('User not found');
@@ -304,7 +304,7 @@ export const deleteUserTimezone = async (user_id: number, id: number) => {
 		id: TimezoneSchema.extract('id').required()
 	}).validateAsync({ user_id, id });
 
-	const user = await getUserById(validatedData.user_id);
+	const user = await getUser({ where: { id: validatedData.user_id } });
 
 	if (!user) {
 		throw new Error('User not found');
