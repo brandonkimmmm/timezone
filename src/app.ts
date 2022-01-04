@@ -1,5 +1,5 @@
 import { PORT } from './config/constants';
-import logger from './utils/logger';
+import logger from './services/logger.service';
 import morgan from 'morgan';
 import express from 'express';
 import { nanoid } from 'nanoid';

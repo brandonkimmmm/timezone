@@ -1,6 +1,6 @@
 import User, { Role, FindUserOpts } from '../db/models/user';
-import logger from '../utils/logger';
-import { signToken } from '../utils/jwt';
+import logger from './logger.service';
+import { signToken } from './auth.service';
 
 export const getUser = async (opts: FindUserOpts = {}) => {
 	logger.debug('api/models/user/getUserById', 'opts:', opts);

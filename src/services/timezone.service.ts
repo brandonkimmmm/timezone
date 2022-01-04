@@ -1,9 +1,13 @@
-import logger from '../utils/logger';
+import logger from './logger.service';
 import { isString, isEmpty, omit } from 'lodash';
-import { getCityTimezone } from '../utils/timezones';
 import { getUser } from './user.service';
-import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
-import { UserAttributes } from '../db/models/user';
+import Timezone, {
+	FindTimezoneOpts,
+	TimezoneInstance
+} from '../db/models/timezone';
+import { UserInstance } from '../db/models/user';
+import cityTimezones from 'city-timezones';
+import { DateTime } from 'luxon';
 
 export const getTimezone = async (opts: FindTimezoneOpts = {}) => {
 	return Timezone.findOne(opts);
@@ -74,7 +78,7 @@ interface UpdateData {
 export const updateTimezone = async (
 	id: number,
 	data: UpdateTimezoneData,
-	user: Pick<UserAttributes, 'id' | 'role'>
+	user: Pick<UserInstance, 'id' | 'role'>
 ) => {
 	logger.debug(
 		'api/models/timezone/updateUserTimezone',
@@ -149,7 +153,7 @@ export const updateTimezone = async (
 
 export const deleteTimezone = async (
 	id: number,
-	user: Pick<UserAttributes, 'id' | 'role'>
+	user: Pick<UserInstance, 'id' | 'role'>
 ) => {
 	logger.debug('api/models/timezone/deleteUserTimezone', 'id:', id);
 
@@ -167,4 +171,62 @@ export const deleteTimezone = async (
 	await existingTimezone.destroy();
 
 	return existingTimezone;
+};
+
+interface CityTimezone {
+	timezone: string;
+	offset: string;
+}
+
+interface FormattedTimezone {
+	name: string;
+	city: string;
+	timezone: string;
+	offset: string;
+	current_time: string;
+}
+
+export const getCityTimezone = async (
+	city: string,
+	country?: string
+): Promise<CityTimezone> => {
+	const cityLookup = cityTimezones.lookupViaCity(city);
+
+	if (isEmpty(cityLookup)) {
+		throw new Error('Invalid city');
+	}
+
+	const foundCity = country
+		? cityLookup.find((city) => city.iso2 === country)
+		: cityLookup[0];
+
+	if (!foundCity) {
+		throw new Error('Invalid city');
+	}
+
+	const timezone = foundCity.timezone;
+	const offset = `${DateTime.now().setZone(timezone).offset / 60}:00`;
+
+	return {
+		timezone,
+		offset
+	};
+};
+
+export const getCurrentTime = (timezone: string): string => {
+	return DateTime.now().setZone(timezone).toFormat('FFF');
+};
+
+export const formatTimezones = async (
+	timezones: TimezoneInstance[]
+): Promise<FormattedTimezone[]> => {
+	return timezones.map((timezone) => {
+		return {
+			name: timezone.name,
+			city: timezone.city,
+			timezone: timezone.timezone,
+			offset: timezone.offset,
+			current_time: getCurrentTime(timezone.timezone)
+		};
+	});
 };

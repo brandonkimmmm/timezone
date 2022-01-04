@@ -7,7 +7,7 @@ import {
 	MutationDeleteTimezoneArgs
 } from '../types/user';
 import { ApolloError } from 'apollo-server-express';
-import { TimezoneSchema } from '../../utils/schemas';
+import { TimezoneSchema } from '../../services/schema.service';
 import Joi from 'joi';
 import { getUser } from '../../services/user.service';
 import {

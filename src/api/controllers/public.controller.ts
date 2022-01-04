@@ -1,4 +1,4 @@
-import logger from '../../utils/logger';
+import logger from '../../services/logger.service';
 import { Request, Response } from 'express';
 import { loginUser, createUser } from '../../services/user.service';
 

@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
-import { UserSchema } from '../../utils/schemas';
+import { UserSchema } from '../../services/schema.service';
 
 const PostLoginSchema = Joi.object({
 	email: UserSchema.extract('email').required(),

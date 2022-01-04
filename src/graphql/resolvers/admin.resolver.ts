@@ -12,7 +12,7 @@ import {
 	MutationDeleteUserArgs
 } from '../types/admin';
 import { ApolloError } from 'apollo-server-express';
-import { UserSchema, TimezoneSchema } from '../../utils/schemas';
+import { UserSchema, TimezoneSchema } from '../../services/schema.service';
 import Joi from 'joi';
 import {
 	createUser,
