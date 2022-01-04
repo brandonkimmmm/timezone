@@ -1,11 +1,9 @@
 extend type Query {
-	login(email: String!, password: String!): AuthenticateResponse!
 	getUser: User!
 	getTimezones: [Timezone]!
 }
 
 extend type Mutation {
-	signup(email: String!, password: String!, password_confirmation: String!): User!
 	createTimezone(name: String!, city: String!, country: String): Timezone!
 	updateTimezone(name: String!, updated_name: String!, updated_city: String!, country: String): Timezone!
 	deleteTimezone(name: String!): Timezone!

@@ -1,32 +1,20 @@
 import { IResolvers } from '@graphql-tools/utils';
 import {
-	AuthenticateResponse,
-	QueryLoginArgs,
 	User,
-	MutationSignupArgs,
 	Timezone,
 	MutationCreateTimezoneArgs,
 	MutationUpdateTimezoneArgs,
 	MutationDeleteTimezoneArgs
 } from '../types/user';
 import { ApolloError } from 'apollo-server-express';
-import { UserSchema, TimezoneSchema } from '../../utils/schemas';
+import { TimezoneSchema } from '../../utils/schemas';
 import Joi from 'joi';
-import { getUserById, loginUser, signupUser } from '../../services/UserService';
+import { getUserById } from '../../services/UserService';
 import {
 	getUserTimezones,
 	createUserTimezone,
 	updateUserTimezone
 } from '../../services/TimezoneService';
-
-const LoginSchema = Joi.object({
-	email: UserSchema.extract('email').required(),
-	password: UserSchema.extract('password').required()
-});
-
-const SignupSchema = LoginSchema.keys({
-	password_confirmation: Joi.required().valid(Joi.ref('password'))
-});
 
 const CreateUserTimezoneSchema = Joi.object({
 	name: TimezoneSchema.extract('name').required(),
@@ -41,20 +29,6 @@ const DeleteUserTimezoneSchema = Joi.object({
 
 export const UserResolvers: IResolvers = {
 	Query: {
-		async login(
-			_: void,
-			args: QueryLoginArgs
-		): Promise<AuthenticateResponse> {
-			try {
-				const { email, password } = await LoginSchema.validateAsync(
-					args
-				);
-				const token = await loginUser(email, password);
-				return { token };
-			} catch (err) {
-				throw new ApolloError(err instanceof Error ? err.message : '');
-			}
-		},
 		async getUser(_: void, args: void, { user }): Promise<User> {
 			try {
 				if (!user) {
@@ -85,16 +59,6 @@ export const UserResolvers: IResolvers = {
 		}
 	},
 	Mutation: {
-		async signup(_: void, args: MutationSignupArgs): Promise<User> {
-			try {
-				const { email, password } = await SignupSchema.validateAsync(
-					args
-				);
-				return signupUser(email, password);
-			} catch (err) {
-				throw new ApolloError(err instanceof Error ? err.message : '');
-			}
-		},
 		async createTimezone(
 			_: void,
 			args: MutationCreateTimezoneArgs,

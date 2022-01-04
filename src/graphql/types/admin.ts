@@ -64,6 +64,7 @@ export type MutationUpdateTimezoneArgs = {
 
 export type MutationUpdateUserArgs = {
   id: Scalars['Int'];
+  role: Scalars['String'];
 };
 
 export type Query = {
@@ -206,7 +207,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'name' | 'user_id'>>;
   deleteUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'id'>>;
   updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'name' | 'updated_city' | 'updated_name' | 'user_id'>>;
-  updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id'>>;
+  updateUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'role'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

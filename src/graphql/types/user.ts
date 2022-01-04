@@ -25,7 +25,6 @@ export type Mutation = {
   _empty?: Maybe<Scalars['String']>;
   createTimezone: Timezone;
   deleteTimezone: Timezone;
-  signup: User;
   updateTimezone: Timezone;
 };
 
@@ -42,13 +41,6 @@ export type MutationDeleteTimezoneArgs = {
 };
 
 
-export type MutationSignupArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
-  password_confirmation: Scalars['String'];
-};
-
-
 export type MutationUpdateTimezoneArgs = {
   country?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
@@ -61,13 +53,6 @@ export type Query = {
   _empty?: Maybe<Scalars['String']>;
   getTimezones: Array<Maybe<Timezone>>;
   getUser: User;
-  login: AuthenticateResponse;
-};
-
-
-export type QueryLoginArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
 };
 
 export type Timezone = {
@@ -196,7 +181,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationCreateTimezoneArgs, 'city' | 'name'>>;
   deleteTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationDeleteTimezoneArgs, 'name'>>;
-  signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'password_confirmation'>>;
   updateTimezone?: Resolver<ResolversTypes['Timezone'], ParentType, ContextType, RequireFields<MutationUpdateTimezoneArgs, 'name' | 'updated_city' | 'updated_name'>>;
 };
 
@@ -204,7 +188,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   getTimezones?: Resolver<Array<Maybe<ResolversTypes['Timezone']>>, ParentType, ContextType>;
   getUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  login?: Resolver<ResolversTypes['AuthenticateResponse'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'email' | 'password'>>;
 };
 
 export type TimezoneResolvers<ContextType = any, ParentType extends ResolversParentTypes['Timezone'] = ResolversParentTypes['Timezone']> = {
