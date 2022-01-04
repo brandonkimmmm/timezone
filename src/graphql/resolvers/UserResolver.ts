@@ -12,7 +12,7 @@ import Joi from 'joi';
 import { getUser } from '../../services/UserService';
 import {
 	getTimezones,
-	createUserTimezone,
+	createTimezone,
 	updateUserTimezone,
 	deleteUserTimezone
 } from '../../services/TimezoneService';
@@ -81,7 +81,7 @@ export const UserResolvers: IResolvers = {
 				}
 				const { name, city, country } =
 					await CreateUserTimezoneSchema.validateAsync(args);
-				return createUserTimezone(user.id, name, city, country);
+				return createTimezone(user.id, name, city, country);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

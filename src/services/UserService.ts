@@ -27,13 +27,11 @@ export const createUser = async (
 		throw new Error(`User ${email} already exists`);
 	}
 
-	const user = await User.create({
+	return User.create({
 		email,
 		password,
 		role
 	});
-
-	return user;
 };
 
 export const updateUserRole = async (id: number, role: Role) => {
@@ -94,7 +92,5 @@ export const loginUser = async (email: string, password: string) => {
 		throw new Error('Invalid password given');
 	}
 
-	const token = await signToken(user.id, user.email, user.role);
-
-	return token;
+	return signToken(user.id, user.email, user.role);
 };

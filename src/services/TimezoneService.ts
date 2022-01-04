@@ -1,10 +1,8 @@
 import logger from '../utils/logger';
-import { isInteger, isString, isEmpty, omit } from 'lodash';
+import { isString, isEmpty, omit } from 'lodash';
 import { getCityTimezone } from '../utils/timezones';
 import { getUser } from './UserService';
 import Timezone, { FindTimezoneOpts } from '../db/models/timezone';
-import { TimezoneSchema } from '../utils/schemas';
-import Joi from 'joi';
 
 export const getTimezone = async (opts: FindTimezoneOpts = {}) => {
 	return Timezone.findOne(opts);
@@ -14,32 +12,7 @@ export const getTimezones = async (opts: FindTimezoneOpts = {}) => {
 	return Timezone.findAll(opts);
 };
 
-export const getUserTimezones = async (
-	user_id: number,
-	opts: FindTimezoneOpts = {}
-) => {
-	const validatedUserId = await TimezoneSchema.extract('user_id')
-		.required()
-		.validateAsync(user_id);
-
-	logger.debug(
-		'api/models/timezone/getUserTimezones',
-		'user_id:',
-		validatedUserId
-	);
-
-	const user = await getUser({ where: { id: validatedUserId } });
-
-	if (!user) {
-		throw new Error('User not found');
-	}
-
-	const timezones = await user.getTimezones(opts);
-
-	return timezones;
-};
-
-export const createUserTimezone = async (
+export const createTimezone = async (
 	user_id: number,
 	name: string,
 	city: string,
@@ -76,14 +49,12 @@ export const createUserTimezone = async (
 		throw new Error('Timezone with name already exists for user');
 	}
 
-	const userTimezone = await user.createTimezone({
+	return user.createTimezone({
 		name,
 		city,
 		timezone,
 		offset
 	});
-
-	return userTimezone;
 };
 
 interface UpdateTimezoneData {

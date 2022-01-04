@@ -22,7 +22,7 @@ import {
 	updateUserRole
 } from '../../services/UserService';
 import {
-	createUserTimezone,
+	createTimezone,
 	deleteUserTimezone,
 	getTimezones,
 	updateUserTimezone
@@ -175,7 +175,7 @@ export const AdminResolvers: IResolvers = {
 				}
 				const { user_id, name, city, country } =
 					await CreateTimezoneSchema.validateAsync(args);
-				return createUserTimezone(user_id, name, city, country);
+				return createTimezone(user_id, name, city, country);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}
