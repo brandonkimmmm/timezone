@@ -20,13 +20,13 @@ import {
 	getUserById,
 	getUsers,
 	updateUserRole
-} from '../services/UserService';
+} from '../../services/UserService';
 import {
 	createUserTimezone,
 	deleteUserTimezone,
 	getUserTimezones,
 	updateUserTimezone
-} from '../services/TimezoneService';
+} from '../../services/TimezoneService';
 
 const GetUserSchema = Joi.object({
 	id: UserSchema.extract('id').required()

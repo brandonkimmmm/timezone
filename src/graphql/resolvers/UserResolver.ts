@@ -12,12 +12,12 @@ import {
 import { ApolloError } from 'apollo-server-express';
 import { UserSchema, TimezoneSchema } from '../../utils/schemas';
 import Joi from 'joi';
-import { getUserById, loginUser, signupUser } from '../services/UserService';
+import { getUserById, loginUser, signupUser } from '../../services/UserService';
 import {
 	getUserTimezones,
 	createUserTimezone,
 	updateUserTimezone
-} from '../services/TimezoneService';
+} from '../../services/TimezoneService';
 
 const LoginSchema = Joi.object({
 	email: UserSchema.extract('email').required(),

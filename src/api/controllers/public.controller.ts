@@ -1,8 +1,6 @@
 import logger from '../../utils/logger';
-import * as User from '../models/user';
-import { omit } from 'lodash';
-import { signToken } from '../../utils/jwt';
 import { Request, Response } from 'express';
+import { loginUser, signupUser } from '../../services/UserService';
 
 export const getInfo = async (req: Request, res: Response) => {
 	return res.json({
@@ -22,7 +20,7 @@ export const postSignup = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.createUser(email, password);
+		const user = await signupUser(email, password);
 
 		logger.verbose(
 			req.nanoid,
@@ -30,9 +28,7 @@ export const postSignup = async (req: Request, res: Response) => {
 			`User ${user.email} created`
 		);
 
-		return res.status(201).json(
-			omit(user.toJSON(), ['password'])
-		);
+		return res.status(201).json(user);
 	} catch (err) {
 		logger.error(
 			req.nanoid,
@@ -40,7 +36,9 @@ export const postSignup = async (req: Request, res: Response) => {
 			err instanceof Error ? err.message : ''
 		);
 
-		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
+		return res
+			.status(400)
+			.json({ message: err instanceof Error ? err.message : '' });
 	}
 };
 
@@ -55,25 +53,7 @@ export const postLogin = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const user = await User.getUserByEmail(email);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
-		const isValidPassword = await user.verifyPassword(password);
-
-		if (!isValidPassword) {
-			throw new Error('Invalid password given');
-		}
-
-		logger.verbose(
-			req.nanoid,
-			'api/controllers/public.controllers/postLogin',
-			'user logged in'
-		);
-
-		const token = await signToken(user.id, user.email, user.role);
+		const token = await loginUser(email, password);
 
 		return res.json({
 			token
@@ -85,78 +65,8 @@ export const postLogin = async (req: Request, res: Response) => {
 			err instanceof Error ? err.message : ''
 		);
 
-		return res.status(400).json({ message: err instanceof Error ? err.message : '' });
-	}
-};
-
-export const login = async (email: string, password: string) => {
-	// logger.info(
-	// 	req.nanoid,
-	// 	'api/controllers/public.controllers/postLogin',
-	// 	'email:',
-	// 	email
-	// );
-
-	try {
-		const user = await User.getUserByEmail(email);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
-		const isValidPassword = await user.verifyPassword(password);
-
-		if (!isValidPassword) {
-			throw new Error('Invalid password given');
-		}
-
-		// logger.verbose(
-		// 	req.nanoid,
-		// 	'api/controllers/public.controllers/postLogin',
-		// 	'user logged in'
-		// );
-
-		const token = await signToken(user.id, user.email, user.role);
-
-		return token;
-	} catch (err) {
-		// logger.error(
-		// 	req.nanoid,
-		// 	'api/controllers/public.controllers/postLogin',
-		// 	err instanceof Error ? err.message : ''
-		// );
-
-		// return res.status(400).json({ message: err instanceof Error ? err.message : '' });
-		throw err;
-	}
-};
-
-export const signup = async (email: string, password: string) => {
-	// logger.info(
-	// 	req.nanoid,
-	// 	'api/controllers/public.controllers/postSignup',
-	// 	'email:',
-	// 	email
-	// );
-
-	try {
-		const user = await User.createUser(email, password);
-
-		// logger.verbose(
-		// 	req.nanoid,
-		// 	'api/controllers/public.controllers/postSignup',
-		// 	`User ${user.email} created`
-		// );
-
-		return omit(user.toJSON(), ['password']);
-	} catch (err) {
-		// logger.error(
-		// 	req.nanoid,
-		// 	'api/controllers/public.controllers/postSignup',
-		// 	err instanceof Error ? err.message : ''
-		// );
-
-		// return res.status(400).json({ message: err instanceof Error ? err.message : '' });
-		throw err;
+		return res
+			.status(400)
+			.json({ message: err instanceof Error ? err.message : '' });
 	}
 };

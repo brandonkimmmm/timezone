@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server-express';
 import { AdminSchema, UserSchema } from './schemas';
-import { verifyToken } from '../api/middleware/authenticate';
+import { verifyToken } from '../utils/jwt';
 
 export const userServer = new ApolloServer({
 	schema: UserSchema,

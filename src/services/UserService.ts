@@ -1,19 +1,15 @@
+import User, { Role, FindUserOpts } from '../db/models/user';
+import logger from '../utils/logger';
+import { UserSchema } from '../utils/schemas';
 import Joi from 'joi';
-import User, { Role, FindUserOpts } from '../../db/models/user';
-import logger from '../../utils/logger';
-import { UserSchema } from '../../utils/schemas';
+import { signToken } from '../utils/jwt';
 
-export const getUserById = async (
-	id: number,
-	opts: FindUserOpts = {}
-) => {
-	const validatedId = await UserSchema.extract('id').required().validateAsync(id);
+export const getUserById = async (id: number, opts: FindUserOpts = {}) => {
+	const validatedId = await UserSchema.extract('id')
+		.required()
+		.validateAsync(id);
 
-	logger.debug(
-		'api/models/user/getUserById',
-		'id:',
-		validatedId
-	);
+	logger.debug('api/models/user/getUserById', 'id:', validatedId);
 
 	const user = await User.findByPk(validatedId, opts);
 
@@ -24,13 +20,11 @@ export const getUserByEmail = async (
 	email: string,
 	opts: FindUserOpts = {}
 ) => {
-	const validatedEmail = await UserSchema.extract('email').required().validateAsync(email);
+	const validatedEmail = await UserSchema.extract('email')
+		.required()
+		.validateAsync(email);
 
-	logger.debug(
-		'api/models/user/getUserByEmail',
-		'email:',
-		validatedEmail
-	);
+	logger.debug('api/models/user/getUserByEmail', 'email:', validatedEmail);
 
 	const user = await User.findOne({
 		where: { email: validatedEmail },
@@ -40,12 +34,8 @@ export const getUserByEmail = async (
 	return user;
 };
 
-export const getUsers = async (
-	opts: FindUserOpts = {}
-) => {
-	logger.debug(
-		'api/models/user/getUsers'
-	);
+export const getUsers = async (opts: FindUserOpts = {}) => {
+	logger.debug('api/models/user/getUsers');
 
 	const users = await User.findAll(opts);
 
@@ -86,10 +76,7 @@ export const createUser = async (
 	return user;
 };
 
-export const updateUserRole = async (
-	id: number,
-	role: Role
-) => {
+export const updateUserRole = async (id: number, role: Role) => {
 	const validatedData = await Joi.object({
 		id: UserSchema.extract('id').required(),
 		role: UserSchema.extract('role').required()
@@ -117,25 +104,26 @@ export const updateUserRole = async (
 		throw new Error(`User already has role ${validatedData.role}`);
 	}
 
-	await user.update({
-		role: validatedData.role
-	}, { fields: ['role'] });
+	await user.update(
+		{
+			role: validatedData.role
+		},
+		{ fields: ['role'] }
+	);
 
 	return user;
 };
 
 export const deleteUser = async (id: number) => {
-	const validatedId = await UserSchema.extract('id').required().validateAsync(id);
+	const validatedId = await UserSchema.extract('id')
+		.required()
+		.validateAsync(id);
 
 	if (validatedId === 1) {
 		throw new Error('Cannot delete master admin');
 	}
 
-	logger.debug(
-		'api/models/user/deleteUser',
-		'id:',
-		validatedId
-	);
+	logger.debug('api/models/user/deleteUser', 'id:', validatedId);
 
 	const user = await getUserById(validatedId);
 
@@ -144,6 +132,40 @@ export const deleteUser = async (id: number) => {
 	}
 
 	await user.destroy();
+
+	return user;
+};
+
+export const loginUser = async (email: string, password: string) => {
+	const validatedData = await Joi.object({
+		id: UserSchema.extract('email').required(),
+		role: UserSchema.extract('password').required()
+	}).validateAsync({ email, password });
+
+	const user = await getUserByEmail(validatedData.email);
+
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	const isValidPassword = await user.verifyPassword(validatedData.password);
+
+	if (!isValidPassword) {
+		throw new Error('Invalid password given');
+	}
+
+	const token = await signToken(user.id, user.email, user.role);
+
+	return token;
+};
+
+export const signupUser = async (email: string, password: string) => {
+	const validatedData = await Joi.object({
+		id: UserSchema.extract('email').required(),
+		role: UserSchema.extract('password').required()
+	}).validateAsync({ email, password });
+
+	const user = await createUser(validatedData.email, validatedData.password);
 
 	return user;
 };

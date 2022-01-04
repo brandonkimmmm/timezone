@@ -1,6 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/constants';
 import P from 'bluebird';
+import { pick } from 'lodash';
 
 export const signToken = async (
 	id: number,
@@ -35,4 +36,15 @@ export const decodeToken = async (
 			resolve(decoded);
 		});
 	});
+};
+
+export const verifyToken = async (token: string) => {
+	if (!token) return null;
+	try {
+		const decodedToken = await decodeToken(token);
+		const decodedUser = pick(decodedToken, ['id', 'email', 'role']);
+		return decodedUser;
+	} catch (err) {
+		return null;
+	}
 };

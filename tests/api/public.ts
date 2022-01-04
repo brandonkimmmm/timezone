@@ -12,7 +12,6 @@ chai.use(chaiHttp);
 const USER = getMockUser();
 
 describe('Public endpoints', () => {
-
 	before(async () => {
 		await truncate();
 	});
@@ -72,7 +71,9 @@ describe('Public endpoints', () => {
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal('"email" must be a valid email');
+					res.body.message.should.equal(
+						'"email" must be a valid email'
+					);
 					done();
 				});
 		});
@@ -90,7 +91,9 @@ describe('Public endpoints', () => {
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal('"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/');
+					res.body.message.should.equal(
+						'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
+					);
 					done();
 				});
 		});
@@ -108,7 +111,9 @@ describe('Public endpoints', () => {
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal('"password_confirmation" must be [ref:password]');
+					res.body.message.should.equal(
+						'"password_confirmation" must be [ref:password]'
+					);
 					done();
 				});
 		});
@@ -126,7 +131,9 @@ describe('Public endpoints', () => {
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal(`User ${USER.email} already exists`);
+					res.body.message.should.equal(
+						`User ${USER.email} already exists`
+					);
 					done();
 				});
 		});
@@ -161,7 +168,9 @@ describe('Public endpoints', () => {
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal('"email" must be a valid email');
+					res.body.message.should.equal(
+						'"email" must be a valid email'
+					);
 					done();
 				});
 		});
@@ -171,14 +180,16 @@ describe('Public endpoints', () => {
 				.post('/login')
 				.send({
 					email: USER.email,
-					password: 'hi',
+					password: 'hi'
 				})
 				.end((err, res) => {
 					should.not.exist(err);
 					res.should.have.status(400);
 					res.body.should.be.an('object');
 					res.body.should.have.property('message');
-					res.body.message.should.equal('"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/');
+					res.body.message.should.equal(
+						'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
+					);
 					done();
 				});
 		});

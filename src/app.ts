@@ -4,8 +4,6 @@ import morgan from 'morgan';
 import express from 'express';
 import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
-import userRouter from './api/routes/user.routes';
-import adminRouter from './api/routes/admin.routes';
 import { userServer, adminServer } from './graphql';
 
 const app = express();
@@ -38,8 +36,6 @@ app.use(async (req, res, next) => {
 });
 
 app.use(publicRouter);
-app.use('/user', userRouter);
-app.use('/admin', adminRouter);
 
 (async () => {
 	await userServer.start();
