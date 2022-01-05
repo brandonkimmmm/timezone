@@ -1,6 +1,4 @@
 import faker from 'faker';
-import { expect } from 'chai';
-import { sortBy } from 'lodash';
 import { Role, UserAttributes } from '../../src/db/models/user';
 
 export const getMockUser = (role: Role = 'user'): UserAttributes => {

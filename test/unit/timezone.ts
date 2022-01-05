@@ -6,7 +6,8 @@ import {
 	getTimezone,
 	getTimezones,
 	updateTimezone,
-	deleteTimezone
+	deleteTimezone,
+	getCityTimezone
 } from '../../src/services/timezone.service';
 import { getMockUser, getMockTimezone } from '../utils/mock';
 import { omit } from 'lodash';
@@ -299,6 +300,37 @@ describe('Timezone Helper Functions', () => {
 			});
 
 			expect(timezone).to.be.null;
+		});
+	});
+
+	describe('#getCityTimezone', () => {
+		it('it should return timezone and offset', async () => {
+			const data = await getCityTimezone('new york');
+
+			expect(data).to.eql({
+				timezone: 'America/New_York',
+				offset: '-5:00'
+			});
+		});
+
+		it('it should return timezone and offset for correct country', async () => {
+			const data = await getCityTimezone('los angeles', 'US');
+
+			expect(data).to.eql({
+				timezone: 'America/Los_Angeles',
+				offset: '-8:00'
+			});
+		});
+
+		it('it should throw an error if city is invalid', async () => {
+			try {
+				await getCityTimezone('nope');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Invalid city'
+				);
+			}
 		});
 	});
 });
