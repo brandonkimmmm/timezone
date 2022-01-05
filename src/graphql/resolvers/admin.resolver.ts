@@ -69,6 +69,10 @@ const DeleteTimezoneSchema = Joi.object({
 	id: TimezoneSchema.extract('id').required()
 });
 
+const GetTimezonesSchema = Joi.object({
+	user_id: TimezoneSchema.extract('user_id').required()
+});
+
 export const AdminResolvers: IResolvers = {
 	Query: {
 		async getUser(
@@ -98,7 +102,7 @@ export const AdminResolvers: IResolvers = {
 					throw new Error('Not Authorized');
 				}
 
-				return getUsers();
+				return getUsers({ order: [['id', 'asc']] });
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}
@@ -112,8 +116,21 @@ export const AdminResolvers: IResolvers = {
 				if (!user || user.role !== 'admin') {
 					throw new Error('Not Authorized');
 				}
-				const { id } = await GetUserSchema.validateAsync(args);
-				return getTimezones({ where: { user_id: id } });
+				const { user_id } = await GetTimezonesSchema.validateAsync(
+					args
+				);
+
+				const userData = await getUser({
+					where: { id: user_id },
+					raw: true,
+					attributes: ['id']
+				});
+
+				if (!userData) {
+					throw new Error('User not found');
+				}
+
+				return getTimezones({ where: { user_id } });
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

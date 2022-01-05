@@ -29,7 +29,7 @@ describe('Graphql User Server', () => {
 	describe('#Query getUser', () => {
 		it('it should return all user data', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: '{ getUser { id email role created_at updated_at }}'
@@ -50,7 +50,7 @@ describe('Graphql User Server', () => {
 
 		it('it should return user email, role', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: '{ getUser { email role }}'
@@ -68,7 +68,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if bearer token is not sent', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.send({ query: '{ getUser { id email }}' })
 				.expect(200)
 				.end((err, res) => {
@@ -82,7 +82,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if password is requested', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({ query: '{ getUser { password }}' })
 				.expect(400)
@@ -99,7 +99,7 @@ describe('Graphql User Server', () => {
 	describe('#Mutation createTimezone', () => {
 		it('it should return all data for created timezone', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -142,7 +142,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if invalid bearer token is sent', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer nope` })
 				.send({
 					query: `
@@ -165,7 +165,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if timezone exists', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -188,7 +188,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if invalid city is given', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -211,7 +211,7 @@ describe('Graphql User Server', () => {
 	describe('#Query getTimezones', () => {
 		it('it should return all timezones data', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: '{ getTimezones { id name city timezone offset created_at updated_at }}'
@@ -229,7 +229,7 @@ describe('Graphql User Server', () => {
 
 		it('it should return timezones name', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: '{ getTimezones { name }}'
@@ -249,7 +249,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if bearer token is not sent', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.send({ query: '{ getTimezones { id name }}' })
 				.expect(200)
 				.end((err, res) => {
@@ -265,7 +265,7 @@ describe('Graphql User Server', () => {
 	describe('#Mutation updateTimezone', () => {
 		it('it should return all data for updated timezone', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -315,7 +315,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if no bearer token is sent', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.send({
 					query: `
 						mutation {
@@ -344,7 +344,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if no update data given', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -370,7 +370,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if data with existing data given', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -400,7 +400,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if timezone does not exist', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -432,7 +432,7 @@ describe('Graphql User Server', () => {
 	describe('#Mutation deleteTimezone', () => {
 		it('it should return all data for deleted timezone', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
@@ -467,7 +467,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if no bearer token is sent', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.send({
 					query: `
 						mutation {
@@ -489,7 +489,7 @@ describe('Graphql User Server', () => {
 
 		it('it should send error if timezone does not exist', (done) => {
 			request(app)
-				.post('/graphql')
+				.post('/graphql/user')
 				.set({ Authorization: `Bearer ${USER.token}` })
 				.send({
 					query: `
