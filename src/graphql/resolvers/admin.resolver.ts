@@ -19,7 +19,7 @@ import {
 	deleteUser,
 	getUser,
 	getUsers,
-	updateUserRole
+	updateUser
 } from '../../services/user.service';
 import {
 	createTimezone,
@@ -40,7 +40,11 @@ const CreateUserSchema = Joi.object({
 
 const UpdateUserSchema = Joi.object({
 	id: UserSchema.extract('id').required(),
-	role: UserSchema.extract('role').required()
+	data: Joi.object({
+		role: UserSchema.extract('role')
+	})
+		.required()
+		.min(1)
 });
 
 const CreateTimezoneSchema = Joi.object({
@@ -125,8 +129,8 @@ export const AdminResolvers: IResolvers = {
 				if (!user || user.role !== 'admin') {
 					throw new Error('Not Authorized');
 				}
-				const { id, role } = await UpdateUserSchema.validateAsync(args);
-				return updateUserRole(id, role);
+				const { id, data } = await UpdateUserSchema.validateAsync(args);
+				return updateUser(id, data);
 			} catch (err) {
 				throw new ApolloError(err instanceof Error ? err.message : '');
 			}

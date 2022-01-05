@@ -5,10 +5,14 @@ extend type Query {
 }
 
 extend type Mutation {
-	updateUser(id: Int!, role: String!): User!
+	updateUser(id: Int!, data: UpdateUserData!): User!
 	createUser(email: String!, password: String!, password_confirmation: String!): User!
 	deleteUser(id: Int!): User!
 	createTimezone(user_id: Int!, name: String!, city: String!, country: String): Timezone!
 	updateTimezone(id: Int!, data: UpdateTimezoneData!): Timezone!
 	deleteTimezone(id: Int!): Timezone!
+}
+
+input UpdateUserData {
+	role: String
 }

@@ -34,12 +34,16 @@ export const createUser = async (
 	});
 };
 
-export const updateUserRole = async (id: number, role: Role) => {
+interface UpdateUserData {
+	role?: Role;
+}
+
+export const updateUser = async (id: number, data: UpdateUserData) => {
 	if (id === 1) {
 		throw new Error('Cannot update master admin role');
 	}
 
-	logger.debug('api/models/user/updateUserRole', 'id:', id, 'role:', role);
+	logger.debug('api/models/user/updateUserRole', 'id:', id, 'data:', data);
 
 	const user = await getUser({ where: { id } });
 
@@ -47,13 +51,13 @@ export const updateUserRole = async (id: number, role: Role) => {
 		throw new Error('User not found');
 	}
 
-	if (user.role === role) {
-		throw new Error(`User already has role ${role}`);
+	if (user.role === data.role) {
+		throw new Error(`User already has role ${data.role}`);
 	}
 
 	await user.update(
 		{
-			role
+			role: data.role
 		},
 		{ fields: ['role'] }
 	);
