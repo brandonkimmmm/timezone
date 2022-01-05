@@ -15,6 +15,7 @@ import {
 	SALT_ROUNDS,
 	VALID_ROLES
 } from '../../config/constants';
+import { omit } from 'lodash';
 
 export type Role = 'admin' | 'user';
 
@@ -109,6 +110,13 @@ const User = sequelize.define<UserInstance>(
 
 User.prototype.verifyPassword = function (password: string) {
 	return bcrypt.compare(password, this.password);
+};
+
+const toJSON = User.prototype.toJSON;
+
+User.prototype.toJSON = function () {
+	const data = toJSON.call(this);
+	return omit(data, 'password');
 };
 
 User.hasMany(Timezone, {

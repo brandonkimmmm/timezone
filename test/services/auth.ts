@@ -26,19 +26,13 @@ describe('Auth helper fucntions', () => {
 		it('it should return decoded token', async () => {
 			const decodedToken = await decodeToken(USER.token);
 
-			expect(decodedToken).to.have.all.keys(
-				'id',
-				'email',
-				'role',
-				'iat',
-				'exp'
-			);
-
-			expect(decodedToken).to.include({
-				id: USER.id,
-				email: USER.email,
-				role: USER.role
-			});
+			expect(decodedToken)
+				.to.have.all.keys('id', 'email', 'role', 'iat', 'exp')
+				.to.include({
+					id: USER.id,
+					email: USER.email,
+					role: USER.role
+				});
 		});
 
 		it('it should throw an error if token is invalid', async () => {

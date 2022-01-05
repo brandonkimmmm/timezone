@@ -36,25 +36,25 @@ describe('Timezone Helper Functions', () => {
 
 			const timezone = data.toJSON();
 
-			expect(timezone).to.have.all.keys(
-				'id',
-				'user_id',
-				'timezone',
-				'city',
-				'name',
-				'offset',
-				'created_at',
-				'updated_at'
-			);
-
-			expect(timezone).to.include({
-				id: 1,
-				user_id: USER.id,
-				city: TIMEZONE.city,
-				name: TIMEZONE.name,
-				offset: '-5:00',
-				timezone: 'America/New_York'
-			});
+			expect(timezone)
+				.to.have.all.keys(
+					'id',
+					'user_id',
+					'timezone',
+					'city',
+					'name',
+					'offset',
+					'created_at',
+					'updated_at'
+				)
+				.to.include({
+					id: 1,
+					user_id: USER.id,
+					city: TIMEZONE.city,
+					name: TIMEZONE.name,
+					offset: '-5:00',
+					timezone: 'America/New_York'
+				});
 
 			TIMEZONE = timezone;
 		});
@@ -127,8 +127,7 @@ describe('Timezone Helper Functions', () => {
 				raw: true
 			});
 
-			expect(timezones).to.be.an('array');
-			expect(timezones).to.have.length(1);
+			expect(timezones).to.be.an('array').to.have.length(1);
 			expect(timezones[0]).to.eql(TIMEZONE);
 		});
 	});
