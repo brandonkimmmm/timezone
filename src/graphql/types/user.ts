@@ -15,11 +15,6 @@ export type Scalars = {
   Date: Date;
 };
 
-export type AuthenticateResponse = {
-  __typename?: 'AuthenticateResponse';
-  token: Scalars['String'];
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']>;
@@ -148,7 +143,6 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  AuthenticateResponse: ResolverTypeWrapper<AuthenticateResponse>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -162,7 +156,6 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  AuthenticateResponse: AuthenticateResponse;
   Boolean: Scalars['Boolean'];
   Date: Scalars['Date'];
   Int: Scalars['Int'];
@@ -172,11 +165,6 @@ export type ResolversParentTypes = {
   Timezone: Timezone;
   UpdateTimezoneData: UpdateTimezoneData;
   User: User;
-};
-
-export type AuthenticateResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthenticateResponse'] = ResolversParentTypes['AuthenticateResponse']> = {
-  token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
@@ -217,7 +205,6 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
-  AuthenticateResponse?: AuthenticateResponseResolvers<ContextType>;
   Date?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

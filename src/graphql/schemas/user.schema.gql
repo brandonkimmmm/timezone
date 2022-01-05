@@ -8,7 +8,3 @@ extend type Mutation {
 	updateTimezone(id: Int!, data: UpdateTimezoneData): Timezone!
 	deleteTimezone(id: Int!): Timezone!
 }
-
-type AuthenticateResponse {
-	token: String!
-}
