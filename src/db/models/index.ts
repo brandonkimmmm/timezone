@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { NODE_ENV } from '../../config/constants';
 import DbConfig from '../../config/db';
-import logger from '../../utils/logger';
+import logger from '../../services/logger.service';
 
 const sequelize = new Sequelize({
 	...DbConfig[NODE_ENV],

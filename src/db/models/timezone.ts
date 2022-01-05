@@ -1,10 +1,5 @@
 import { sequelize } from '.';
-import {
-	DataTypes,
-	Model,
-	Optional,
-	FindOptions
-} from 'sequelize';
+import { DataTypes, Model, Optional, FindOptions } from 'sequelize';
 
 interface TimezoneAttributes {
 	id: number;
@@ -12,17 +7,19 @@ interface TimezoneAttributes {
 	city: string;
 	timezone: string;
 	offset: string;
+	created_at: Date;
+	updated_at: Date;
+	user_id: number;
 }
 
-export type FindTimezoneOpts = FindOptions<TimezoneAttributes>
+export type FindTimezoneOpts = FindOptions<TimezoneAttributes>;
 
-interface TimezoneCreationAttributes extends Optional<TimezoneAttributes, 'id'> {}
+interface TimezoneCreationAttributes
+	extends Optional<TimezoneAttributes, 'id' | 'created_at' | 'updated_at'> {}
 
-export interface TimezoneInstance extends Model<TimezoneAttributes, TimezoneCreationAttributes>,
-	TimezoneAttributes {
-		created_at?: Date;
-		updated_at?: Date;
-	}
+export interface TimezoneInstance
+	extends Model<TimezoneAttributes, TimezoneCreationAttributes>,
+		TimezoneAttributes {}
 
 const Timezone = sequelize.define<TimezoneInstance>(
 	'Timezone',
@@ -55,8 +52,23 @@ const Timezone = sequelize.define<TimezoneInstance>(
 		offset: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		created_at: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			defaultValue: DataTypes.NOW
+		},
+		updated_at: {
+			type: DataTypes.DATE,
+			allowNull: false,
+			defaultValue: DataTypes.NOW
+		},
+		user_id: {
+			type: DataTypes.INTEGER,
+			allowNull: false
 		}
-	}, {
+	},
+	{
 		tableName: 'Timezones'
 	}
 );

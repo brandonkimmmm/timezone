@@ -1,0 +1,33 @@
+scalar Date
+
+type Query {
+	_empty: String
+}
+
+type Mutation {
+	_empty: String
+}
+
+type User {
+	id: Int!
+	email: String!
+	role: String!
+	created_at: Date!
+	updated_at: Date!
+}
+
+type Timezone {
+	id: Int!
+	name: String!
+	city: String!
+	timezone: String!
+	offset: String!
+	created_at: Date!
+	updated_at: Date!
+}
+
+input UpdateTimezoneData {
+	name: String
+	city: String
+	country: String
+}

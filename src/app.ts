@@ -1,12 +1,10 @@
 import { PORT } from './config/constants';
-import logger from './utils/logger';
+import logger from './services/logger.service';
 import morgan from 'morgan';
 import express from 'express';
 import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
-import userRouter from './api/routes/user.routes';
-import adminRouter from './api/routes/admin.routes';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { userServer, adminServer } from './graphql';
 
 const app = express();
 
@@ -14,10 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(
-	morgan(
-		'tiny',
-		{ stream: { write: (message) => logger.info(message) } }
-	)
+	morgan('tiny', { stream: { write: (message) => logger.info(message) } })
 );
 
 app.use(async (req, res, next) => {
@@ -41,17 +36,14 @@ app.use(async (req, res, next) => {
 });
 
 app.use(publicRouter);
-app.use('/user', userRouter);
-app.use('/admin', adminRouter);
 
-import { schema } from './graphql/schema';
+(async () => {
+	await userServer.start();
+	await adminServer.start();
 
-const apolloServer = new ApolloServer({
-	schema
-});
+	userServer.applyMiddleware({ app, path: '/graphql/user' });
+	adminServer.applyMiddleware({ app, path: '/graphql/admin' });
 
-apolloServer.start().then(() => {
-	apolloServer.applyMiddleware({ app, path: '/graphql' });
 	app.use(async (req, res) => {
 		return res.status(400).json({
 			message: `Path ${req.path} does not exist`
@@ -60,6 +52,6 @@ apolloServer.start().then(() => {
 	app.listen(PORT, () => {
 		logger.info(`Server listening on port ${PORT}`);
 	});
-});
+})();
 
 export default app;
