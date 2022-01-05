@@ -38,7 +38,7 @@ export const decodeToken = async (
 	});
 };
 
-export const verifyToken = async (token: string) => {
+export const verifyToken = async (token?: string) => {
 	if (!token) return null;
 	try {
 		const decodedToken = await decodeToken(token);
