@@ -3,12 +3,12 @@ import logger from './logger.service';
 import { signToken } from './auth.service';
 
 export const getUser = async (opts: FindUserOpts = {}) => {
-	logger.debug('api/models/user/getUserById', 'opts:', opts);
+	logger.debug('services/user.service/getUserById opts:', opts);
 	return User.findOne(opts);
 };
 
 export const getUsers = async (opts: FindUserOpts = {}) => {
-	logger.debug('api/models/user/getUsers');
+	logger.debug('services/user.service/getUsers opts:', opts);
 	return User.findAll(opts);
 };
 
@@ -17,7 +17,13 @@ export const createUser = async (
 	password: string,
 	role: Role = 'user'
 ) => {
-	logger.debug('api/models/user/createUser', 'email:', email, 'role:', role);
+	logger.debug(
+		'services/user.service/createUser',
+		'email:',
+		email,
+		'role:',
+		role
+	);
 
 	const existingUser = await getUser({
 		where: { email }
@@ -43,7 +49,7 @@ export const updateUser = async (id: number, data: UpdateUserData) => {
 		throw new Error('Cannot update master admin role');
 	}
 
-	logger.debug('api/models/user/updateUserRole', 'id:', id, 'data:', data);
+	logger.debug('services/user.service/updateUser', 'id:', id, 'data:', data);
 
 	const user = await getUser({ where: { id } });
 
@@ -70,7 +76,7 @@ export const deleteUser = async (id: number) => {
 		throw new Error('Cannot delete master admin');
 	}
 
-	logger.debug('api/models/user/deleteUser', 'id:', id);
+	logger.debug('services/user.service/deleteUser', 'id:', id);
 
 	const user = await getUser({ where: { id } });
 
@@ -84,6 +90,8 @@ export const deleteUser = async (id: number) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
+	logger.debug('services/user.service/loginUser', 'email:', email);
+
 	const user = await User.scope('validation').findOne({ where: { email } });
 
 	if (!user) {

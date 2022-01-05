@@ -10,10 +10,12 @@ import cityTimezones from 'city-timezones';
 import { DateTime } from 'luxon';
 
 export const getTimezone = async (opts: FindTimezoneOpts = {}) => {
+	logger.debug('services/timezone.service/getTimezone opts:', opts);
 	return Timezone.findOne(opts);
 };
 
 export const getTimezones = async (opts: FindTimezoneOpts = {}) => {
+	logger.debug('services/timezone.service/getTimezones opts:', opts);
 	return Timezone.findAll(opts);
 };
 
@@ -30,7 +32,7 @@ export const createTimezone = async (
 	}
 
 	logger.debug(
-		'api/models/timezone/createUserTimezone',
+		'services/timezone.service/createTimezone',
 		'user_id:',
 		user_id,
 		'name:',
@@ -81,7 +83,7 @@ export const updateTimezone = async (
 	user: Pick<UserInstance, 'id' | 'role'>
 ) => {
 	logger.debug(
-		'api/models/timezone/updateUserTimezone',
+		'services/timezone.service/updateTimezone',
 		'id:',
 		id,
 		'data:',
@@ -155,7 +157,7 @@ export const deleteTimezone = async (
 	id: number,
 	user: Pick<UserInstance, 'id' | 'role'>
 ) => {
-	logger.debug('api/models/timezone/deleteUserTimezone', 'id:', id);
+	logger.debug('services/timezone.service/deleteTimezone', 'id:', id);
 
 	const existingTimezone = await getTimezone({ where: { id } });
 
