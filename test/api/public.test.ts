@@ -22,7 +22,7 @@ describe('Public endpoints', () => {
 				.get('/health')
 				.expect(200)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({ name, version });
 					done();
 				});
@@ -40,7 +40,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(201)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body)
 						.to.have.all.keys(
 							'id',
@@ -68,7 +68,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message: '"email" must be a valid email'
 					});
@@ -86,7 +86,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message:
 							'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
@@ -105,7 +105,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message:
 							'"password_confirmation" must be [ref:password]'
@@ -124,7 +124,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message: `User ${USER.email} already exists`
 					});
@@ -143,7 +143,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(200)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.have.all.keys('token');
 					expect(res.body.token).to.be.a('string').to.not.be.empty;
 					done();
@@ -159,7 +159,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message: '"email" must be a valid email'
 					});
@@ -176,7 +176,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message:
 							'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
@@ -194,7 +194,7 @@ describe('Public endpoints', () => {
 				})
 				.expect(400)
 				.end((err, res) => {
-					expect(err).to.not.exist;
+					if (err) return done(err);
 					expect(res.body).to.eql({
 						message: 'User not found'
 					});

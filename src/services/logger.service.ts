@@ -31,24 +31,24 @@ const logFormat = winston.format.combine(
 	)
 );
 
-const rotateTransport: DailyRotateFile = new DailyRotateFile({
-	filename: 'timezone-%DATE%.log',
-	dirname: path.join(__dirname, '../../', 'logs'),
-	datePattern: 'YYYY-MM-DD-HH',
-	zippedArchive: true,
-	maxSize: '20m',
-	maxFiles: '14d'
-});
-
 const logger: winston.Logger = winston.createLogger({
 	format: logFormat,
-	transports: [
-		rotateTransport,
-		new winston.transports.Console({
-			level,
-			silent: NODE_ENV === 'test'
-		})
-	],
+	transports:
+		NODE_ENV === 'test'
+			? []
+			: [
+					new DailyRotateFile({
+						filename: 'timezone-%DATE%.log',
+						dirname: path.join(__dirname, '../../', 'logs'),
+						datePattern: 'YYYY-MM-DD-HH',
+						zippedArchive: true,
+						maxSize: '20m',
+						maxFiles: '14d'
+					}),
+					new winston.transports.Console({
+						level
+					})
+			  ],
 	silent: NODE_ENV === 'test'
 });
 
