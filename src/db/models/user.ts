@@ -6,8 +6,7 @@ import {
 	HasManyGetAssociationsMixin,
 	HasManyCreateAssociationMixin,
 	HasManyHasAssociationMixin,
-	FindOptions,
-	Sequelize
+	FindOptions
 } from 'sequelize';
 import Timezone, { TimezoneInstance } from './timezone';
 import bcrypt from 'bcrypt';
@@ -83,12 +82,12 @@ const User = sequelize.define<UserInstance>(
 		created_at: {
 			type: DataTypes.DATE,
 			allowNull: false,
-			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+			defaultValue: DataTypes.NOW
 		},
 		updated_at: {
 			type: DataTypes.DATE,
 			allowNull: false,
-			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+			defaultValue: DataTypes.NOW
 		}
 	},
 	{

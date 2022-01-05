@@ -63,8 +63,8 @@ export const createTimezone = async (
 };
 
 interface UpdateTimezoneData {
-	name: string | null;
-	city: string | null;
+	name?: string | null;
+	city?: string | null;
 	country?: string | null;
 }
 

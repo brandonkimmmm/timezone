@@ -1,5 +1,5 @@
 import { sequelize } from '.';
-import { DataTypes, Model, Optional, FindOptions, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, FindOptions } from 'sequelize';
 
 interface TimezoneAttributes {
 	id: number;
@@ -56,12 +56,12 @@ const Timezone = sequelize.define<TimezoneInstance>(
 		created_at: {
 			type: DataTypes.DATE,
 			allowNull: false,
-			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+			defaultValue: DataTypes.NOW
 		},
 		updated_at: {
 			type: DataTypes.DATE,
 			allowNull: false,
-			defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+			defaultValue: DataTypes.NOW
 		},
 		user_id: {
 			type: DataTypes.INTEGER,

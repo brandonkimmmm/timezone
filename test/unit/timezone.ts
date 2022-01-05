@@ -1,231 +1,304 @@
-// import chai, { expect } from 'chai';
-// import { createUser } from '../../src/api/models/user';
-// import { truncate } from '../utils/db';
-// import {
-// 	createUserTimezone,
-// 	getUserTimezone,
-// 	getUserTimezones,
-// 	updateUserTimezone,
-// 	deleteUserTimezone
-// } from '../../src/api/models/timezone';
-// import { getMockUser } from '../utils/mock';
+import { expect } from 'chai';
+import { createUser } from '../../src/services/user.service';
+import { truncate } from '../utils/db';
+import {
+	createTimezone,
+	getTimezone,
+	getTimezones,
+	updateTimezone,
+	deleteTimezone
+} from '../../src/services/timezone.service';
+import { getMockUser, getMockTimezone } from '../utils/mock';
+import { omit } from 'lodash';
 
-// const should = chai.should();
+let USER = getMockUser();
+let TIMEZONE = getMockTimezone();
 
-// const USER = getMockUser();
+describe('Timezone Helper Functions', () => {
+	before(async () => {
+		await truncate();
+		const user = await createUser(USER.email, USER.password);
+		USER = user.toJSON();
+	});
 
-// const TIMEZONE = {
-// 	city: 'new york',
-// 	name: 'my city new york'
-// };
+	after(async () => {
+		await truncate();
+	});
 
-// describe('Timezone Helper Functions', () => {
-// 	before(async () => {
-// 		await truncate();
-// 		const user = await createUser(USER.email, USER.password);
-// 		USER.id = user.id;
-// 	});
+	describe('#createTimezone', () => {
+		it('it should create a timezone for user', async () => {
+			const data = await createTimezone(
+				USER.id,
+				TIMEZONE.name,
+				TIMEZONE.city
+			);
 
-// 	after(async () => {
-// 		await truncate();
-// 	});
+			const timezone = data.toJSON();
 
-// 	describe('#createUserTimezone', () => {
-// 		it('it should create a timezone for user', async () => {
-// 			const timezone = await createUserTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
+			expect(timezone).to.have.all.keys(
+				'id',
+				'user_id',
+				'timezone',
+				'city',
+				'name',
+				'offset',
+				'created_at',
+				'updated_at'
+			);
 
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('dataValues');
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('user_id');
-// 			timezone.should.have.property('timezone');
-// 			timezone.should.have.property('city');
-// 			timezone.should.have.property('name');
-// 			timezone.should.have.property('offset');
-// 			// timezone.user_id.should.equal(USER.id);
-// 			timezone.timezone.should.equal('America/New_York');
-// 			timezone.city.should.equal(TIMEZONE.city);
-// 			timezone.name.should.equal(TIMEZONE.name);
-// 			timezone.offset.should.equal('-5:00');
-// 		});
+			expect(timezone).to.include({
+				id: 1,
+				user_id: USER.id,
+				city: TIMEZONE.city,
+				name: TIMEZONE.name,
+				offset: '-5:00',
+				timezone: 'America/New_York'
+			});
 
-// 		it('it should throw an error if timezone name exists', async () => {
-// 			try {
-// 				await createUserTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('Timezone with name already exists for user');
-// 			}
-// 		});
+			TIMEZONE = timezone;
+		});
 
-// 		it('it should throw an error if invalid city is given', async () => {
-// 			try {
-// 				await createUserTimezone(USER.id, TIMEZONE.name, 'nope');
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('Invalid city');
-// 			}
-// 		});
+		it('it should throw an error if timezone name exists', async () => {
+			try {
+				await createTimezone(USER.id, TIMEZONE.name, TIMEZONE.city);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Timezone with name already exists for user'
+				);
+			}
+		});
 
-// 		it('it should throw an error if user does not exist', async () => {
-// 			try {
-// 				await createUserTimezone(9999999, TIMEZONE.name, TIMEZONE.city);
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
-// 			}
-// 		});
-// 	});
+		it('it should throw an error if invalid city is given', async () => {
+			try {
+				await createTimezone(USER.id, TIMEZONE.name, 'nope');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Invalid city'
+				);
+			}
+		});
 
-// 	describe('#getUserTimezone', () => {
-// 		it('it should get a timezone for user', async () => {
-// 			const timezone = await getUserTimezone(USER.id, TIMEZONE.name);
+		it('it should throw an error if user does not exist', async () => {
+			try {
+				await createTimezone(9999999, TIMEZONE.name, TIMEZONE.city);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'User not found'
+				);
+			}
+		});
+	});
 
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('user_id');
-// 			timezone.should.have.property('timezone');
-// 			timezone.should.have.property('city');
-// 			timezone.should.have.property('name');
-// 			timezone.should.have.property('offset');
-// 			// timezone.user_id.should.equal(USER.id);
-// 			timezone.timezone.should.equal('America/New_York');
-// 			timezone.city.should.equal(TIMEZONE.city);
-// 			timezone.name.should.equal(TIMEZONE.name);
-// 			timezone.offset.should.equal('-5:00');
-// 		});
+	describe('#getTimezone', () => {
+		it('it should get timezone created', async () => {
+			const timezone = await getTimezone({
+				where: { id: TIMEZONE.id },
+				raw: true
+			});
 
-// 		it('it should throw an error if user does not exist', async () => {
-// 			try {
-// 				await getUserTimezone(9999999, TIMEZONE.name);
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
-// 			}
-// 		});
+			expect(timezone).to.eql(TIMEZONE);
+		});
 
-// 		it('it should return null if timezone does not exist', async () => {
-// 			const timezone = await getUserTimezone(USER.id, 'nope');
-// 			should.not.exist(timezone);
-// 		});
-// 	});
+		it('it should return null if timezone does not exist', async () => {
+			const timezone = await getTimezone({
+				where: { id: 999999999 },
+				raw: true
+			});
+			expect(timezone).to.be.null;
+		});
 
-// 	describe('#getUserTimezones', () => {
-// 		it('it should get all timezones for user', async () => {
-// 			const timezone = await getUserTimezones(USER.id);
+		it('it should return null if different user_id is passed', async () => {
+			const timezone = await getTimezone({
+				where: { id: TIMEZONE.id, user_id: 999999 },
+				raw: true
+			});
+			expect(timezone).to.be.null;
+		});
+	});
 
-// 			timezone.should.be.an('array');
-// 			timezone.should.have.length(1);
-// 			timezone[0].should.have.property('user_id');
-// 			timezone[0].should.have.property('timezone');
-// 			timezone[0].should.have.property('city');
-// 			timezone[0].should.have.property('name');
-// 			timezone[0].should.have.property('offset');
-// 			// timezone[0].user_id.should.equal(USER.id);
-// 			timezone[0].timezone.should.equal('America/New_York');
-// 			timezone[0].city.should.equal(TIMEZONE.city);
-// 			timezone[0].name.should.equal(TIMEZONE.name);
-// 			timezone[0].offset.should.equal('-5:00');
-// 		});
+	describe('#getTimezones', () => {
+		it('it should get all timezones for user', async () => {
+			const timezones = await getTimezones({
+				where: { user_id: TIMEZONE.user_id },
+				raw: true
+			});
 
-// 		it('it should throw an error if user does not exist', async () => {
-// 			try {
-// 				await getUserTimezones(9999999);
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
-// 			}
-// 		});
-// 	});
+			expect(timezones).to.be.an('array');
+			expect(timezones).to.have.length(1);
+			expect(timezones[0]).to.eql(TIMEZONE);
+		});
+	});
 
-// 	describe('#updateUserTimezone', () => {
-// 		it('it should update an existing timezone for user', async () => {
-// 			const timezone = await updateUserTimezone(USER.id, TIMEZONE.name, { updated_name: 'updated name', updated_city: 'Los Angeles', country: 'US' });
+	describe('#updateTimezone', () => {
+		it('it should update an existing timezone for user', async () => {
+			const data = await updateTimezone(
+				TIMEZONE.id,
+				{
+					name: 'test name',
+					city: 'los angeles',
+					country: 'US'
+				},
+				USER
+			);
 
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('dataValues');
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('user_id');
-// 			timezone.should.have.property('timezone');
-// 			timezone.should.have.property('city');
-// 			timezone.should.have.property('name');
-// 			timezone.should.have.property('offset');
-// 			// timezone.user_id.should.equal(USER.id);
-// 			timezone.timezone.should.equal('America/Los_Angeles');
-// 			timezone.city.should.equal('los angeles');
-// 			timezone.name.should.equal('updated name');
-// 			timezone.offset.should.equal('-8:00');
+			const timezone = data.toJSON();
 
-// 			TIMEZONE.name = timezone.name;
-// 			TIMEZONE.city = timezone.city;
-// 		});
+			expect(timezone).to.have.all.keys(
+				'id',
+				'user_id',
+				'timezone',
+				'city',
+				'name',
+				'offset',
+				'created_at',
+				'updated_at'
+			);
 
-// 		it('it should throw an error if user does not exist', async () => {
-// 			try {
-// 				await updateUserTimezone(9999999, 'updated name', { updated_name: 'updated name', updated_city: 'Los Angeles'});
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
-// 			}
-// 		});
+			expect(omit(timezone, 'updated_at')).to.eql({
+				...omit(TIMEZONE, 'updated_at'),
+				name: 'test name',
+				city: 'los angeles',
+				timezone: 'America/Los_Angeles',
+				offset: '-8:00'
+			});
 
-// 		it('it should throw an error if update data not given', async () => {
-// 			try {
-// 				await updateUserTimezone(USER.id, 'updated name', { });
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('No fields to update');
-// 			}
-// 		});
+			TIMEZONE = timezone;
+		});
 
-// 		it('it should throw an error if name and city are the same', async () => {
-// 			try {
-// 				await updateUserTimezone(USER.id, 'updated name', { updated_name: TIMEZONE.name, updated_city: TIMEZONE.city, country: 'US' });
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('No fields to update');
-// 			}
-// 		});
-// 	});
+		it('it should update another user timezone if user is admin', async () => {
+			const data = await updateTimezone(
+				TIMEZONE.id,
+				{
+					name: 'updated name'
+				},
+				{ ...USER, id: 2, role: 'admin' }
+			);
 
-// 	describe('#deleteUserTimezone', () => {
-// 		it('it should delete an existing timezone for user', async () => {
-// 			const timezone = await deleteUserTimezone(USER.id, TIMEZONE.name);
+			const timezone = data.toJSON();
 
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('dataValues');
-// 			timezone.should.be.an('object');
-// 			timezone.should.have.property('user_id');
-// 			timezone.should.have.property('timezone');
-// 			timezone.should.have.property('city');
-// 			timezone.should.have.property('name');
-// 			timezone.should.have.property('offset');
-// 			// timezone.user_id.should.equal(USER.id);
-// 			timezone.timezone.should.equal('America/Los_Angeles');
-// 			timezone.city.should.equal('los angeles');
-// 			timezone.name.should.equal('updated name');
-// 			timezone.offset.should.equal('-8:00');
+			expect(timezone).to.have.all.keys(
+				'id',
+				'user_id',
+				'timezone',
+				'city',
+				'name',
+				'offset',
+				'created_at',
+				'updated_at'
+			);
 
-// 			const deletedTimezone = await getUserTimezone(USER.id, TIMEZONE.name);
+			expect(omit(timezone, 'updated_at')).to.eql({
+				...omit(TIMEZONE, 'updated_at'),
+				name: 'updated name'
+			});
 
-// 			should.not.exist(deletedTimezone);
-// 		});
+			TIMEZONE = timezone;
+		});
 
-// 		it('it should throw an error if user does not exist', async () => {
-// 			try {
-// 				await deleteUserTimezone(9999999, TIMEZONE.name);
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('User not found');
-// 			}
-// 		});
+		it('it should throw an error if user is not admin and trying to update another user timezone', async () => {
+			try {
+				await updateTimezone(
+					TIMEZONE.id,
+					{
+						name: 'not going through',
+						city: 'paris'
+					},
+					{ ...USER, id: 2 }
+				);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Not Authorized'
+				);
+			}
+		});
 
-// 		it('it should throw an error if timezone not found', async () => {
-// 			try {
-// 				await deleteUserTimezone(USER.id, 'nope');
-// 				expect(true, 'promise should fail').eq(false);
-// 			} catch (err) {
-// 				expect(err instanceof Error ? err.message : '').to.eql('Timezone not found');
-// 			}
-// 		});
-// 	});
-// });
+		it('it should throw an error if update data not given', async () => {
+			try {
+				await updateTimezone(TIMEZONE.id, {}, USER);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'No fields to update'
+				);
+			}
+		});
+
+		it('it should throw an error if name is the same', async () => {
+			try {
+				await updateTimezone(
+					TIMEZONE.id,
+					{
+						name: TIMEZONE.name
+					},
+					USER
+				);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'No fields to update'
+				);
+			}
+		});
+	});
+
+	describe('#deleteTimezone', () => {
+		it('it should throw an error if timezone not found', async () => {
+			try {
+				await deleteTimezone(99999, USER);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Timezone not found'
+				);
+			}
+		});
+
+		it('it should throw an error if non admin user is deleting another user timezone', async () => {
+			try {
+				await deleteTimezone(TIMEZONE.id, { ...USER, id: 2 });
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Not Authorized'
+				);
+			}
+		});
+
+		it('it should delete an existing timezone for user', async () => {
+			const data = await deleteTimezone(TIMEZONE.id, USER);
+			const timezone = data.toJSON();
+
+			expect(timezone).to.eql(TIMEZONE);
+
+			const deletedTimezone = await getTimezone({
+				where: { id: TIMEZONE.id }
+			});
+
+			expect(deletedTimezone).to.be.null;
+		});
+
+		it('it should delete a different user timezone if user is admin', async () => {
+			const createdTimezone = await createTimezone(
+				USER.id,
+				TIMEZONE.name,
+				TIMEZONE.city
+			);
+
+			await deleteTimezone(createdTimezone.id, {
+				...USER,
+				id: 2,
+				role: 'admin'
+			});
+
+			const timezone = await getTimezone({
+				where: { id: createdTimezone.id }
+			});
+
+			expect(timezone).to.be.null;
+		});
+	});
+});
