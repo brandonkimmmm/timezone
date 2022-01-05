@@ -1,11 +1,9 @@
-import chai from 'chai';
+import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../../src/app';
 import { truncate } from '../utils/db';
 import { name, version } from '../../package.json';
 import { getMockUser } from '../utils/mock';
-
-const should = chai.should();
 
 chai.use(chaiHttp);
 
@@ -20,22 +18,20 @@ describe('Public endpoints', () => {
 		await truncate();
 	});
 
-	describe('/GET info', () => {
+	describe('GET /health', () => {
 		it('it should return app version and name', (done) => {
 			chai.request(app)
-				.get('/info')
+				.get('/health')
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(200);
-					res.body.should.be.an('object');
-					res.body.should.have.property('name', name);
-					res.body.should.have.property('version', version);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(200);
+					expect(res.body).to.eql({ name, version });
 					done();
 				});
 		});
 	});
 
-	describe('/POST signup', () => {
+	describe('POST /signup', () => {
 		it('it should return new user email, role, and id', (done) => {
 			chai.request(app)
 				.post('/signup')
@@ -45,15 +41,21 @@ describe('Public endpoints', () => {
 					password_confirmation: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(201);
-					res.body.should.be.an('object');
-					res.body.should.have.property('email');
-					res.body.should.have.property('id');
-					res.body.should.have.property('role');
-					res.body.should.not.have.property('password');
-					res.body.email.should.equal(USER.email);
-					res.body.role.should.equal(USER.role);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(201);
+					expect(res.body)
+						.to.have.all.keys(
+							'id',
+							'email',
+							'role',
+							'created_at',
+							'updated_at'
+						)
+						.to.include({
+							id: 1,
+							email: USER.email,
+							role: USER.role
+						});
 					done();
 				});
 		});
@@ -67,13 +69,11 @@ describe('Public endpoints', () => {
 					password_confirmation: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						'"email" must be a valid email'
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message: '"email" must be a valid email'
+					});
 					done();
 				});
 		});
@@ -87,13 +87,12 @@ describe('Public endpoints', () => {
 					password_confirmation: 'hi'
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message:
+							'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
+					});
 					done();
 				});
 		});
@@ -107,13 +106,12 @@ describe('Public endpoints', () => {
 					password_confirmation: 'nope1avasdf23'
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						'"password_confirmation" must be [ref:password]'
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message:
+							'"password_confirmation" must be [ref:password]'
+					});
 					done();
 				});
 		});
@@ -127,19 +125,17 @@ describe('Public endpoints', () => {
 					password_confirmation: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						`User ${USER.email} already exists`
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message: `User ${USER.email} already exists`
+					});
 					done();
 				});
 		});
 	});
 
-	describe('/POST login', () => {
+	describe('POST /login', () => {
 		it('it should return bearer token on successful login', (done) => {
 			chai.request(app)
 				.post('/login')
@@ -148,10 +144,10 @@ describe('Public endpoints', () => {
 					password: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(200);
-					res.body.should.be.an('object');
-					res.body.should.have.property('token');
+					expect(err).to.not.exist;
+					expect(res).to.have.status(200);
+					expect(res.body).to.have.all.keys('token');
+					expect(res.body.token).to.be.a('string').to.not.be.empty;
 					done();
 				});
 		});
@@ -164,13 +160,11 @@ describe('Public endpoints', () => {
 					password: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						'"email" must be a valid email'
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message: '"email" must be a valid email'
+					});
 					done();
 				});
 		});
@@ -183,13 +177,12 @@ describe('Public endpoints', () => {
 					password: 'hi'
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal(
-						'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
-					);
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message:
+							'"password" with value "hi" fails to match the required pattern: /^[a-zA-Z0-9]{8,20}$/'
+					});
 					done();
 				});
 		});
@@ -202,11 +195,11 @@ describe('Public endpoints', () => {
 					password: USER.password
 				})
 				.end((err, res) => {
-					should.not.exist(err);
-					res.should.have.status(400);
-					res.body.should.be.an('object');
-					res.body.should.have.property('message');
-					res.body.message.should.equal('User not found');
+					expect(err).to.not.exist;
+					expect(res).to.have.status(400);
+					expect(res.body).to.eql({
+						message: 'User not found'
+					});
 					done();
 				});
 		});

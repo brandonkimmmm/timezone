@@ -104,6 +104,11 @@ const User = sequelize.define<UserInstance>(
 		},
 		defaultScope: {
 			attributes: { exclude: ['password'] }
+		},
+		scopes: {
+			validation: {
+				attributes: { include: ['password'] }
+			}
 		}
 	}
 );

@@ -84,7 +84,7 @@ export const deleteUser = async (id: number) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
-	const user = await getUser({ where: { email } });
+	const user = await User.scope('validation').findOne({ where: { email } });
 
 	if (!user) {
 		throw new Error('User not found');

@@ -9,7 +9,8 @@ import {
 	getUser,
 	updateUser,
 	deleteUser,
-	getUsers
+	getUsers,
+	loginUser
 } from '../../src/services/user.service';
 import { getMockUser, getMockTimezone } from '../utils/mock';
 import { omit } from 'lodash';
@@ -22,7 +23,7 @@ describe('User Helper Functions', () => {
 	before(async () => {
 		await truncate();
 		const admin = await createUser(ADMIN.email, ADMIN.password, ADMIN.role);
-		ADMIN = admin.toJSON();
+		ADMIN = { ...ADMIN, ...admin.toJSON() };
 	});
 
 	after(async () => {
@@ -49,7 +50,7 @@ describe('User Helper Functions', () => {
 					role: USER.role
 				});
 
-			USER = user;
+			USER = { ...USER, ...user };
 		});
 
 		it('it should throw an error if user exists', async () => {
@@ -119,6 +120,36 @@ describe('User Helper Functions', () => {
 
 			expect(users).to.be.an('array').to.have.length(1);
 			expect(users[0]).to.eql(omit(USER, 'password'));
+		});
+	});
+
+	describe('#loginUser', () => {
+		it('it should return signed token for existing user', async () => {
+			console.log(USER.password);
+			const token = await loginUser(USER.email, USER.password);
+			expect(token).to.be.a('string').to.not.be.empty;
+		});
+
+		it('it should throw an error if user not found', async () => {
+			try {
+				await loginUser('nope@nope.com', USER.password);
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'User not found'
+				);
+			}
+		});
+
+		it('it should throw an error if invalid password is given', async () => {
+			try {
+				await loginUser(USER.email, 'notmypassword');
+				expect(true, 'promise should fail').eq(false);
+			} catch (err) {
+				expect(err instanceof Error ? err.message : '').to.eql(
+					'Invalid password given'
+				);
+			}
 		});
 	});
 
