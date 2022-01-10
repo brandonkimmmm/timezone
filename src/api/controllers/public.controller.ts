@@ -1,6 +1,7 @@
 import logger from '../../services/logger.service';
 import { Request, Response } from 'express';
 import { loginUser, createUser } from '../../services/user.service';
+import { decodeToken } from '../../services/auth.service';
 
 export const getHealth = async (req: Request, res: Response) => {
 	return res.json({
@@ -66,5 +67,29 @@ export const postLogin = async (req: Request, res: Response) => {
 		return res
 			.status(400)
 			.json({ message: err instanceof Error ? err.message : '' });
+	}
+};
+
+export const getValidateToken = async (req: Request, res: Response) => {
+	logger.info(req.nanoid, 'api/controllers/public.controllers/getValidate');
+
+	try {
+		const { token } = req.query;
+
+		if (!token) {
+			throw new Error('No token found');
+		}
+
+		await decodeToken(token as string);
+
+		return res.json({ message: 'Valid' });
+	} catch (err) {
+		logger.error(
+			req.nanoid,
+			'api/controllers/public.controllers/getValidate',
+			err instanceof Error ? err.message : ''
+		);
+
+		return res.status(400).json({ message: 'Invalid' });
 	}
 };

@@ -5,7 +5,10 @@ import { truncate } from '../utils/db';
 import { name, version } from '../../package.json';
 import { getMockUser } from '../utils/mock';
 
-let USER = getMockUser();
+let USER = {
+	...getMockUser(),
+	token: ''
+};
 
 describe('Public endpoints', () => {
 	before(async () => {
@@ -152,6 +155,7 @@ describe('Public endpoints', () => {
 						role: USER.role
 					});
 					expect(res.body.token).to.be.a('string').to.not.be.empty;
+					USER.token = res.body.token;
 					done();
 				});
 		});
@@ -203,6 +207,49 @@ describe('Public endpoints', () => {
 					if (err) return done(err);
 					expect(res.body).to.eql({
 						message: 'User not found'
+					});
+					done();
+				});
+		});
+	});
+
+	describe('GET /validate-token', () => {
+		it('it should return valid message if cookie token is valid', (done) => {
+			request(app)
+				.get('/validate-token')
+				.query({ token: USER.token })
+				.expect(200)
+				.end((err, res) => {
+					if (err) return done(err);
+					expect(res.body).to.eql({
+						message: 'Valid'
+					});
+					done();
+				});
+		});
+
+		it('it should return 400 error if no token cookie is given', (done) => {
+			request(app)
+				.get('/validate-token')
+				.expect(400)
+				.end((err, res) => {
+					if (err) return done(err);
+					expect(res.body).to.eql({
+						message: 'Invalid'
+					});
+					done();
+				});
+		});
+
+		it('it should return 400 error and remove cookie if invalid token is given', (done) => {
+			request(app)
+				.get('/validate-token')
+				.query({ token: 'nope' })
+				.expect(400)
+				.end((err, res) => {
+					if (err) return done(err);
+					expect(res.body).to.eql({
+						message: 'Invalid'
 					});
 					done();
 				});

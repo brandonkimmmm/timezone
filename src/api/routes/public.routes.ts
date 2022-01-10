@@ -6,5 +6,6 @@ const router = express.Router();
 router.get('/health', publicControllers.getHealth);
 router.post('/signup', validator.postSignup, publicControllers.postSignup);
 router.post('/login', validator.postLogin, publicControllers.postLogin);
+router.get('/validate-token', publicControllers.getValidateToken);
 
 export default router;
