@@ -222,7 +222,9 @@ describe('Public endpoints', () => {
 				.end((err, res) => {
 					if (err) return done(err);
 					expect(res.body).to.eql({
-						message: 'Valid'
+						id: USER.id,
+						email: USER.email,
+						role: USER.role
 					});
 					done();
 				});

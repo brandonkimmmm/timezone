@@ -2,6 +2,7 @@ import logger from '../../services/logger.service';
 import { Request, Response } from 'express';
 import { loginUser, createUser } from '../../services/user.service';
 import { decodeToken } from '../../services/auth.service';
+import { pick } from 'lodash';
 
 export const getHealth = async (req: Request, res: Response) => {
 	return res.json({
@@ -80,9 +81,9 @@ export const getValidateToken = async (req: Request, res: Response) => {
 			throw new Error('No token found');
 		}
 
-		await decodeToken(token as string);
+		const user = await decodeToken(token as string);
 
-		return res.json({ message: 'Valid' });
+		return res.json(pick(user, ['id', 'email', 'role']));
 	} catch (err) {
 		logger.error(
 			req.nanoid,
