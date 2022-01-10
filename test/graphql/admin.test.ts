@@ -2,11 +2,11 @@ import { expect } from 'chai';
 import request from 'supertest';
 import app from '../../src/app';
 import { truncate } from '../utils/db';
-import { createUser, loginUser } from '../../src/services/user.service';
+import { createUser } from '../../src/services/user.service';
 import { createTimezone } from '../../src/services/timezone.service';
 import { getMockUser, getMockTimezone } from '../utils/mock';
 import { delay } from 'bluebird';
-import { omit } from 'lodash';
+import { signToken } from '../../src/services/auth.service';
 
 let ADMIN = {
 	...getMockUser('admin'),
@@ -26,10 +26,10 @@ describe('Graphql Admin Server', () => {
 		const user = await createUser(USER.email, USER.password);
 
 		ADMIN = { ...ADMIN, ...admin.toJSON() };
-		ADMIN.token = await loginUser(ADMIN.email, ADMIN.password);
+		ADMIN.token = await signToken(ADMIN.id, ADMIN.email, ADMIN.role);
 
 		USER = { ...USER, ...user.toJSON() };
-		USER.token = await loginUser(USER.email, USER.password);
+		USER.token = await signToken(USER.id, USER.email, USER.role);
 
 		const adminTimezone = await createTimezone(
 			ADMIN.id,

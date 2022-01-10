@@ -125,8 +125,12 @@ describe('User Helper Functions', () => {
 
 	describe('#loginUser', () => {
 		it('it should return signed token for existing user', async () => {
-			console.log(USER.password);
-			const token = await loginUser(USER.email, USER.password);
+			const { user, token } = await loginUser(USER.email, USER.password);
+			expect(user).to.eql({
+				id: USER.id,
+				email: USER.email,
+				role: USER.role
+			});
 			expect(token).to.be.a('string').to.not.be.empty;
 		});
 

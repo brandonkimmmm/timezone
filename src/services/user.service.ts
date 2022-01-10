@@ -1,6 +1,7 @@
 import User, { Role, FindUserOpts } from '../db/models/user';
 import logger from './logger.service';
 import { signToken } from './auth.service';
+import { pick } from 'lodash';
 
 export const getUser = async (opts: FindUserOpts = {}) => {
 	logger.debug('services/user.service/getUserById opts:', opts);
@@ -104,5 +105,10 @@ export const loginUser = async (email: string, password: string) => {
 		throw new Error('Invalid password given');
 	}
 
-	return signToken(user.id, user.email, user.role);
+	const token = await signToken(user.id, user.email, user.role);
+
+	return {
+		token,
+		user: pick(user, ['id', 'email', 'role'])
+	};
 };

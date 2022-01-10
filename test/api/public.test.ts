@@ -5,7 +5,7 @@ import { truncate } from '../utils/db';
 import { name, version } from '../../package.json';
 import { getMockUser } from '../utils/mock';
 
-const USER = getMockUser();
+let USER = getMockUser();
 
 describe('Public endpoints', () => {
 	before(async () => {
@@ -54,6 +54,7 @@ describe('Public endpoints', () => {
 							email: USER.email,
 							role: USER.role
 						});
+					USER = { ...USER, ...res.body };
 					done();
 				});
 		});
@@ -144,7 +145,12 @@ describe('Public endpoints', () => {
 				.expect(200)
 				.end((err, res) => {
 					if (err) return done(err);
-					expect(res.body).to.have.all.keys('token');
+					expect(res.body).to.have.all.keys('token', 'user');
+					expect(res.body.user).to.eql({
+						id: USER.id,
+						email: USER.email,
+						role: USER.role
+					});
 					expect(res.body.token).to.be.a('string').to.not.be.empty;
 					done();
 				});

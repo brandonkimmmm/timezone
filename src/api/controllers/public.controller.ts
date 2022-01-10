@@ -53,11 +53,9 @@ export const postLogin = async (req: Request, res: Response) => {
 	);
 
 	try {
-		const token = await loginUser(email, password);
+		const data = await loginUser(email, password);
 
-		return res.json({
-			token
-		});
+		return res.json(data);
 	} catch (err) {
 		logger.error(
 			req.nanoid,

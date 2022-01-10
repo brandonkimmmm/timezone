@@ -2,10 +2,11 @@ import { expect } from 'chai';
 import request from 'supertest';
 import app from '../../src/app';
 import { truncate } from '../utils/db';
-import { createUser, loginUser } from '../../src/services/user.service';
+import { createUser } from '../../src/services/user.service';
 import { getMockUser, getMockTimezone } from '../utils/mock';
 import { delay } from 'bluebird';
 import { omit } from 'lodash';
+import { signToken } from '../../src/services/auth.service';
 
 let USER = {
 	...getMockUser(),
@@ -18,7 +19,7 @@ describe('Graphql User Server', () => {
 		await truncate();
 		const user = await createUser(USER.email, USER.password);
 		USER = { ...USER, ...user.toJSON() };
-		USER.token = await loginUser(USER.email, USER.password);
+		USER.token = await signToken(USER.id, USER.email, USER.role);
 		await delay(1000);
 	});
 

@@ -5,9 +5,11 @@ import express from 'express';
 import { nanoid } from 'nanoid';
 import publicRouter from './api/routes/public.routes';
 import { userServer, adminServer } from './graphql';
+import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

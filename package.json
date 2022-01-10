@@ -7,7 +7,7 @@
 		"start": "node build/app.js",
 		"build": "rimraf build && tsc --project tsconfig.build.json",
 		"dev": "nodemon src/app.ts",
-		"test": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test mocha -r ts-node/register tests/**/*.ts --reporter spec --timeout 5000 --exit",
+		"test": "NODE_ENV=test PORT=9000 mocha -r ts-node/register test/**/*.test.ts --reporter spec --timeout 5000 --exit",
 		"codegen": "graphql-codegen --config codegen.yml"
 	},
 	"repository": "git@github.com:brandonkimmmm/timezone.git",
